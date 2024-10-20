@@ -4,7 +4,8 @@ import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
-import { useState } from "react";
+import { useContext } from "react";
+import { UploadContext } from "../context/UploadContext";
 import FeedbackLayout from "../layout/FeedbackLayout";
 import CustomCardHeader from "../ui/CustomCardHeader";
 import Error from "../ui/Error";
@@ -12,7 +13,7 @@ import Info from "../ui/Info";
 import Loading from "../ui/Loading";
 
 export default function AudioWaveform({ uploadStatus }) {
-  const [audio, setAudio] = useState(null);
+  const { audio } = useContext(UploadContext);
 
   const table = (
     <Table>
@@ -34,7 +35,7 @@ export default function AudioWaveform({ uploadStatus }) {
             color="action"
           />
         }
-        isUpload={false}
+        action={false}
       />
 
       <Divider />

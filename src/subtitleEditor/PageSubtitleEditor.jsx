@@ -1,4 +1,5 @@
 import { Container, Grid2 } from "@mui/material";
+import { UploadContextProvider } from "../context/UploadContext";
 import { useStatus } from "../hooks/useStatus";
 import AudioWaveform from "./AudioWaveForm";
 import SubtitleTable from "./SubtitleTable";
@@ -8,40 +9,37 @@ export default function PageSubtitleEditor() {
   const uploadVideoStatus = useStatus();
 
   return (
-    <Container
-      maxWidth={false}
-      sx={{ my: 3 }}
-    >
-      <Grid2
-        container
-        spacing={3}
+    <UploadContextProvider>
+      <Container
+        maxWidth={false}
+        sx={{ my: 3 }}
       >
         <Grid2
-          item
-          xs={12}
-          sm={6}
+          container
+          spacing={3}
         >
-          <SubtitleTable fileType="Subtitle" />
-        </Grid2>
+          <Grid2
+            xs={12}
+            sm={6}
+          >
+            <SubtitleTable fileType="subtitle" />
+          </Grid2>
 
-        <Grid2
-          item
-          xs={12}
-          sm={6}
-        >
-          <VideoPlayer
-            fileType="Video"
-            uploadStatus={uploadVideoStatus}
-          />
-        </Grid2>
+          <Grid2
+            xs={12}
+            sm={6}
+          >
+            <VideoPlayer
+              fileType="video"
+              uploadStatus={uploadVideoStatus}
+            />
+          </Grid2>
 
-        <Grid2
-          item
-          xs={12}
-        >
-          <AudioWaveform uploadStatus={uploadVideoStatus} />
+          <Grid2 xs={12}>
+            <AudioWaveform uploadStatus={uploadVideoStatus} />
+          </Grid2>
         </Grid2>
-      </Grid2>
-    </Container>
+      </Container>
+    </UploadContextProvider>
   );
 }

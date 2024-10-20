@@ -9,7 +9,7 @@ export default function CustomTypography({
   return (
     <Typography
       variant={variant}
-      color="primary"
+      color="secondary"
       align={align}
       m={0}
       {...props}

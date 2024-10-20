@@ -1,5 +1,8 @@
 import AttachFileIcon from "@mui/icons-material/AttachFile";
-import { Button, Grid2, Input, Typography } from "@mui/material";
+import UploadFileRoundedIcon from "@mui/icons-material/UploadFileRounded";
+import VideoFileIcon from "@mui/icons-material/VideoFile";
+import { Button, Chip, Grid2, Input, Typography } from "@mui/material";
+import { capitalizeFirstChar } from "../utils/text";
 
 export default function FileUpload({
   selectedFile,
@@ -14,7 +17,9 @@ export default function FileUpload({
     }
   };
 
-  const isSubtitle = fileType === "Subtitle";
+  const handleDelete = () => setSelectedFile(null);
+
+  const isSubtitle = fileType === "subtitle";
 
   return (
     <>
@@ -22,7 +27,7 @@ export default function FileUpload({
         variant="body1"
         gutterBottom
       >
-        Select a {fileType} file to upload:
+        Select a {capitalizeFirstChar(fileType)} file to upload:
       </Typography>
 
       <Input
@@ -44,7 +49,9 @@ export default function FileUpload({
             variant="outlined"
             size="large"
             component="span"
-            startIcon={<AttachFileIcon />}
+            startIcon={
+              isSubtitle ? <UploadFileRoundedIcon /> : <VideoFileIcon />
+            }
           >
             Select {isSubtitle ? ".srt" : ".mp4"} file
           </Button>
@@ -52,12 +59,35 @@ export default function FileUpload({
       </Grid2>
 
       {selectedFile && (
-        <Typography
-          variant="body2"
-          sx={{ mt: 2 }}
+        <Grid2
+          container
+          spacing={1}
+          flexDirection="column"
         >
-          Selected file: {selectedFile.name}
-        </Typography>
+          <Grid2
+            
+            xs={12}
+          >
+            <Typography
+              variant="body2"
+              sx={{ mt: 2 }}
+            >
+              Selected file:
+            </Typography>
+          </Grid2>
+
+          <Grid2
+            
+            xs={12}
+          >
+            <Chip
+              icon={<AttachFileIcon fontSize="small" />}
+              label={selectedFile.name}
+              color="secondary"
+              onDelete={handleDelete}
+            />
+          </Grid2>
+        </Grid2>
       )}
     </>
   );

@@ -19,10 +19,7 @@ export default function PageError({ targetPage }) {
       sx={{ minHeight: "100vh" }}
       textAlign="center"
     >
-      <Grid2
-        item
-        xs={12}
-      >
+      <Grid2 xs={12}>
         <Typography
           variant="h1"
           color="black"
@@ -31,10 +28,7 @@ export default function PageError({ targetPage }) {
         </Typography>
       </Grid2>
 
-      <Grid2
-        item
-        xs={12}
-      >
+      <Grid2 xs={12}>
         <Typography
           variant="h3"
           color="black"
@@ -43,10 +37,7 @@ export default function PageError({ targetPage }) {
         </Typography>
       </Grid2>
 
-      <Grid2
-        item
-        xs={12}
-      >
+      <Grid2 xs={12}>
         <Typography
           variant="h5"
           color="black"
@@ -56,7 +47,6 @@ export default function PageError({ targetPage }) {
       </Grid2>
 
       <Grid2
-        item
         xs={12}
         mt={2}
       >

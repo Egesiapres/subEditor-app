@@ -1,3 +1,4 @@
+import DeleteIcon from "@mui/icons-material/Delete";
 import UploadIcon from "@mui/icons-material/Upload";
 import { Button, CardHeader } from "@mui/material";
 
@@ -6,15 +7,16 @@ export default function CustomCardHeader({
   fileType,
   subheader,
   avatar,
+  action = true,
   isUpload = true,
 }) {
   return (
     <CardHeader
       subheader={subheader}
       action={
-        isUpload && (
+        action && (
           <Button
-            startIcon={<UploadIcon />}
+            startIcon={isUpload ? <UploadIcon /> : <DeleteIcon />}
             onClick={modal.open}
           >
             {fileType}

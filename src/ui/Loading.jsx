@@ -6,7 +6,7 @@ export default function Loading() {
       container
       justifyContent="center"
     >
-      <Grid2 item>
+      <Grid2>
         <CircularProgress />
       </Grid2>
     </Grid2>

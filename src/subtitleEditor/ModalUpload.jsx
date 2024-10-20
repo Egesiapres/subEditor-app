@@ -7,19 +7,63 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { useState } from "react";
+import srtParser2 from "srt-parser-2";
 import ModalCloseButton from "../ui/ModalCloseButton";
 import Upload from "../ui/Upload";
+import {
+  getSessionStorageItem,
+  setSessionStorageItem,
+} from "../utils/sessionStorage";
+import { capitalizeFirstChar } from "../utils/text";
 
-export default function ModalUpload({ modal, fileType }) {
+export default function ModalUpload({ modal, fileType, setFile, status }) {
   const [selectedFile, setSelectedFile] = useState(null);
 
-  // Simula l'upload del file
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (selectedFile) {
-      console.log("File caricato:", selectedFile);
-      // Puoi gestire l'upload del file qui
+      status.setLoading();
+
+      // Read file content as text
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const parser = new srtParser2();
+
+        let _selectedFile = reader.result; // Obtain file content
+
+        _selectedFile = parser.fromSrt(_selectedFile); // Parse from into JSON format
+
+        _selectedFile = _selectedFile.map(
+          ({ startSeconds, endSeconds, id, startTime, endTime, text }) => {
+            // const duration = endTime - startTime;
+            const duration = endSeconds - startSeconds;
+
+            return {
+              id,
+              startTime,
+              endTime,
+              duration,
+              text,
+            };
+          }
+        );
+
+        setSessionStorageItem("subtitle", _selectedFile);
+
+        const subtitle = getSessionStorageItem("subtitle");
+        setFile(subtitle);
+
+        status.setSuccess();
+        modal.close();
+      };
+
+      reader.onerror = () => {
+        status.setError("Error reading file");
+      };
+
+      // Read the file as text
+      reader.readAsText(selectedFile);
     }
-    modal.close();
   };
 
   return (
@@ -28,7 +72,7 @@ export default function ModalUpload({ modal, fileType }) {
       onClose={modal.close}
     >
       <DialogTitle>
-        Upload {fileType}
+        Upload {capitalizeFirstChar(fileType)}
         <ModalCloseButton modal={modal} />
       </DialogTitle>
 
@@ -46,6 +90,7 @@ export default function ModalUpload({ modal, fileType }) {
           onClick={handleUpload}
           variant="contained"
           color="primary"
+          loading={status.isLoading}
           disabled={!selectedFile}
         >
           Upload
