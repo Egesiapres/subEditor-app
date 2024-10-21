@@ -19,7 +19,7 @@ import { setSessionStorageItem } from "../../utils/sessionStorage";
 import { capitalizeFirstChar } from "../../utils/text";
 
 export default function ModalSubtitle({ modal, fileType, row, status }) {
-  const { subtitles } = useContext(UploadContext);
+  const { subtitles, subtitlesData } = useContext(UploadContext);
 
   // const [duration, setDuration] = useState(row?.duration || 0);
 
@@ -59,8 +59,13 @@ export default function ModalSubtitle({ modal, fileType, row, status }) {
 
       subtitles[row.id - 1] = row;
 
+      const _subtitlesData = {
+        ...subtitlesData,
+        fileContent: subtitles,
+      };
+
       await fakeRequest();
-      setSessionStorageItem("subtitles", subtitles);
+      setSessionStorageItem("subtitles", _subtitlesData);
 
       status.setSuccess();
       modal.close();

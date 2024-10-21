@@ -20,11 +20,12 @@ import { fakeRequest } from "../../api/api";
 import { UploadContext } from "../../context/UploadContext";
 import CustomTypography from "../../ui/CustomTypography";
 import ModalCloseButton from "../../ui/ModalCloseButton";
+import { setSessionStorageItem } from "../../utils/sessionStorage";
 import { capitalizeFirstChar } from "../../utils/text";
 import SubtitleTableRow from "./SubtitleTableRow";
 
 export default function ModalMergeSubtitles({ modal, fileType, status }) {
-  const { subtitles, setSubtitles, selectedRows, setSelectedRows } =
+  const { subtitles, subtitlesData, selectedRows, setSelectedRows } =
     useContext(UploadContext);
 
   const [firstRow, secondRow] = selectedRows.sort((a, b) => a.id - b.id);
@@ -44,7 +45,7 @@ export default function ModalMergeSubtitles({ modal, fileType, status }) {
 
     try {
       let _subtitles = [...subtitles];
-      _subtitles.splice(subtitles.indexOf(firstRow), 2, mergedRow);
+      _subtitles.splice(_subtitles.indexOf(firstRow), 2, mergedRow);
 
       // eslint-disable-next-line no-unused-vars
       _subtitles = _subtitles.map(({ id: noSyncedId, ...rest }, index) => ({
@@ -54,13 +55,19 @@ export default function ModalMergeSubtitles({ modal, fileType, status }) {
 
       console.log(_subtitles);
 
+      const _subtitlesData = {
+        ...subtitlesData,
+        fileContent: _subtitles,
+      };
+
+      // TODO: bug fetching data after a merge
+      // Probably the problem is still the .slice method
       await fakeRequest();
-      setSubtitles(_subtitles);
+      setSessionStorageItem("subtitles", _subtitlesData);
+      setSelectedRows([]);
 
       status.setSuccess();
       modal.close();
-
-      setSelectedRows([]);
     } catch (err) {
       status?.setError(err);
     }
