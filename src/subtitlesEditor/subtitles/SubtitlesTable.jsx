@@ -1,12 +1,12 @@
-import EditIcon from "@mui/icons-material/Edit";
+import FilePresentRoundedIcon from "@mui/icons-material/FilePresentRounded";
 import MergeIcon from "@mui/icons-material/Merge";
 import SubtitlesIcon from "@mui/icons-material/Subtitles";
 import {
   Button,
   Card,
-  Checkbox,
+  Chip,
   Divider,
-  IconButton,
+  Grid2,
   Table,
   TableContainer,
   TableHead,
@@ -14,8 +14,7 @@ import {
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
-import { useContext, useState } from "react";
-import { formatTimestamp } from "subtitle";
+import { useContext } from "react";
 import { clearSessionStorageItem } from "../..//utils/sessionStorage";
 import { UploadContext } from "../../context/UploadContext";
 import useModal from "../../hooks/useModal";
@@ -29,16 +28,19 @@ import ModalConfirm from "../../ui/ModalConfirm";
 import Warning from "../../ui/Warning";
 import { capitalizeFirstChar } from "../../utils/text";
 import ModalUpload from "../ModalUpload";
+import ModalMergeSubtitles from "./ModalMergeSubtitles";
 import ModalSubtitle from "./ModalSubtitle";
+import SubtitleTableRow from "./SubtitleTableRow";
 
 export default function SubtitlesTable({ fileType }) {
-  const { subtitles, setSubtitles, video } = useContext(UploadContext);
-
-  const [selectedRows, setSelectedRows] = useState([]);
+  const { subtitlesData, subtitles, setSubtitles, video, selectedRows } =
+    useContext(UploadContext);
 
   const subtitleStatus = useStatus();
 
   const modalUploadSubtitles = useModal();
+
+  const modalMergeSubtitles = useModal();
 
   const modalConfirmDeleteSubtitles = useModal();
 
@@ -57,7 +59,26 @@ export default function SubtitlesTable({ fileType }) {
           modal={
             !subtitles ? modalUploadSubtitles : modalConfirmDeleteSubtitles
           }
-          subheader="Subtitles Table"
+          subheader={
+            <Grid2
+              container
+              spacing={1}
+              alignItems="center"
+            >
+              <Grid2>Subtitles Table {subtitlesData && "- File:"}</Grid2>
+
+              {subtitlesData && (
+                <Chip
+                  sx={{ pl: 0.5 }}
+                  icon={<FilePresentRoundedIcon fontSize="small" />}
+                  label={subtitlesData?.fileName}
+                  variant="outlined"
+                  // size="small"
+                  color="primary"
+                />
+              )}
+            </Grid2>
+          }
           avatar={
             <SubtitlesIcon
               fontSize="small"
@@ -69,6 +90,7 @@ export default function SubtitlesTable({ fileType }) {
             <Button
               variant="contained"
               startIcon={<MergeIcon />}
+              onClick={modalMergeSubtitles.open}
               disabled={selectedRows.length < 2}
             >
               Merge
@@ -87,7 +109,6 @@ export default function SubtitlesTable({ fileType }) {
             subtitles={subtitles}
             fileType={fileType}
             selectedRows={selectedRows}
-            setSelectedRows={setSelectedRows}
           />
         ) : (
           <Info text="No Subtitles file detected. To see Subtitles details, upload a .srt file." />
@@ -101,7 +122,14 @@ export default function SubtitlesTable({ fileType }) {
       {modalUploadSubtitles.isOpen && (
         <ModalUpload
           modal={modalUploadSubtitles}
-          setFile={setSubtitles}
+          fileType={fileType}
+          status={subtitleStatus}
+        />
+      )}
+
+      {modalMergeSubtitles.isOpen && (
+        <ModalMergeSubtitles
+          modal={modalMergeSubtitles}
           fileType={fileType}
           status={subtitleStatus}
         />
@@ -110,8 +138,9 @@ export default function SubtitlesTable({ fileType }) {
       {modalConfirmDeleteSubtitles.isOpen && (
         <ModalConfirm
           modal={modalConfirmDeleteSubtitles}
+          title={`Delete ${capitalizeFirstChar(fileType)}`}
+          text="Do you really want to delete the Subtitles?"
           handleConfirm={handleConfirmDeleteSubtitles}
-          fileType={fileType}
           status={subtitleStatus}
         />
       )}
@@ -119,12 +148,7 @@ export default function SubtitlesTable({ fileType }) {
   );
 }
 
-const CustomTableContent = ({
-  subtitles,
-  fileType,
-  selectedRows,
-  setSelectedRows,
-}) => (
+const CustomTableContent = ({ subtitles, fileType, selectedRows }) => (
   <>
     <TableContainer>
       <Table>
@@ -164,13 +188,11 @@ const CustomTableContent = ({
         </TableHead>
 
         <TableBody>
-          {subtitles.map((subtitle, index) => (
+          {subtitles.map((subtitleRow, index) => (
             <CustomTableRow
               key={index}
-              row={subtitle}
+              row={subtitleRow}
               fileType={fileType}
-              selectedRows={selectedRows}
-              setSelectedRows={setSelectedRows}
             />
           ))}
         </TableBody>
@@ -179,12 +201,10 @@ const CustomTableContent = ({
   </>
 );
 
-const CustomTableRow = ({ row, fileType, selectedRows, setSelectedRows }) => {
-  const { subtitles, setSubtitles } = useContext(UploadContext);
-
+const CustomTableRow = ({ row, fileType }) => {
   const rowStatus = useStatus();
 
-  const modalEditSubtitle = useModal();
+  const modalSubtitle = useModal();
 
   return (
     <>
@@ -202,80 +222,18 @@ const CustomTableRow = ({ row, fileType, selectedRows, setSelectedRows }) => {
       ) : (
         <SubtitleTableRow
           row={row}
-          modalEditSubtitle={modalEditSubtitle}
-          selectedRows={selectedRows}
-          setSelectedRows={setSelectedRows}
+          modalSubtitle={modalSubtitle}
         />
       )}
 
-      {modalEditSubtitle.isOpen && (
+      {modalSubtitle.isOpen && (
         <ModalSubtitle
-          modal={modalEditSubtitle}
+          modal={modalSubtitle}
           fileType={fileType}
-          file={subtitles}
-          setFile={setSubtitles}
           row={row}
           status={rowStatus}
         />
       )}
     </>
-  );
-};
-
-const SubtitleTableRow = ({
-  row,
-  modalEditSubtitle,
-  selectedRows,
-  setSelectedRows,
-}) => {
-  const handleChange = event => {
-    const isChecked = event.target.checked;
-
-    if (isChecked) {
-      if (selectedRows.length < 2) {
-        setSelectedRows([...selectedRows, row]);
-      }
-    } else {
-      setSelectedRows(
-        selectedRows.filter(selectedRow => selectedRow.id !== row.id)
-      );
-    }
-  };
-
-  const isDisabled = selectedRows.length >= 1;
-
-  const isSelected = selectedRows.some(
-    selectedRow => selectedRow.id === row.id
-  );
-
-  const isNext =
-    selectedRows[0]?.id === row.id - 1 || selectedRows[0]?.id === row.id + 1;
-
-  return (
-    <TableRow hover>
-      <TableCell padding="checkbox">
-        <Checkbox
-          color="primary"
-          checked={isSelected}
-          onChange={handleChange}
-          disabled={
-            selectedRows.length === 2
-              ? !isSelected && isDisabled
-              : !isSelected && !isNext && isDisabled
-          }
-        />
-      </TableCell>
-      <TableCell align="center">{row?.id}</TableCell>
-      <TableCell align="center">{formatTimestamp(row?.start)}</TableCell>
-      <TableCell align="center">{formatTimestamp(row?.end)}</TableCell>
-      <TableCell align="center">{formatTimestamp(row?.duration)}</TableCell>
-      <TableCell align="center">{row?.text}</TableCell>
-
-      <TableCell key={row?.id}>
-        <IconButton onClick={modalEditSubtitle.open}>
-          <EditIcon fontSize="small" />
-        </IconButton>
-      </TableCell>
-    </TableRow>
   );
 };

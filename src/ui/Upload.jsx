@@ -38,7 +38,7 @@ export default function FileUpload({
       >
         Select a {capitalizeFirstChar(fileType)} file to upload:
       </Typography>
-      
+
       <input
         type="file"
         onChange={handleFileChange}

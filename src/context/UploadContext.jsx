@@ -1,4 +1,5 @@
 import { createContext, useState } from "react";
+// eslint-disable-next-line no-unused-vars
 import { clearSessionStorageItems, getSessionStorageItem } from "../utils/sessionStorage";
 
 const sampleVideo = {
@@ -23,15 +24,21 @@ const sampleVideo = {
 export const UploadContext = createContext();
 
 export const UploadContextProvider = ({ children }) => {
-  // clearSessionStorageItems();
+  // clearSessionStorageItems()
+  
+  const subtitlesData = getSessionStorageItem("subtitles")
   
   console.log(sessionStorage);
 
   const [subtitles, setSubtitles] = useState(
-    getSessionStorageItem("subtitles") || null
+    subtitlesData?.fileContent || null
   );
 
   console.log("subtitles", subtitles);
+
+  const [selectedRows, setSelectedRows] = useState([]);
+
+  console.log("selectedRows", selectedRows);
 
   // const [video, setVideo] = useState(sampleVideo || null);
   const [video, setVideo] = useState(null);
@@ -39,10 +46,13 @@ export const UploadContextProvider = ({ children }) => {
   const [audio, setAudio] = useState(null);
 
   const value = {
+    subtitlesData,
     subtitles,
+    selectedRows,
     video,
     audio,
     setSubtitles,
+    setSelectedRows,
     setVideo,
     setAudio,
   };

@@ -8,13 +8,12 @@ import {
 } from "@mui/material";
 import { fakeRequest } from "../api/api";
 import ModalCloseButton from "../ui/ModalCloseButton";
-import { capitalizeFirstChar } from "../utils/text";
 
 export default function ModalConfirm({
-  modal,  
+  modal,
+  title = "Confirm",
+  text = "Do you really want to proceed?",
   handleConfirm,
-  text,
-  fileType,
   status,
 }) {
   const handleClick = async () => {
@@ -35,16 +34,13 @@ export default function ModalConfirm({
     <Dialog
       open={modal.isOpen}
       onClose={modal.close}
-      
     >
       <DialogTitle>
-        Delete {capitalizeFirstChar(fileType)}
+        {title}
         <ModalCloseButton modal={modal} />
       </DialogTitle>
 
-      <DialogContent>
-        {text || "Do really want to proceed?"}
-      </DialogContent>
+      <DialogContent>{text}</DialogContent>
 
       <DialogActions>
         <Button onClick={modal.close}>Cancel</Button>
@@ -52,7 +48,7 @@ export default function ModalConfirm({
           onClick={handleClick}
           variant="contained"
           color="primary"
-          loading={status.isLoading}
+          loading={status?.isLoading}
         >
           Confirm
         </LoadingButton>

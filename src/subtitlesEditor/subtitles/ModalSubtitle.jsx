@@ -11,50 +11,56 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { fakeRequest } from "../../api/api";
+import { UploadContext } from "../../context/UploadContext";
 import ModalCloseButton from "../../ui/ModalCloseButton";
 import { setSessionStorageItem } from "../../utils/sessionStorage";
 import { capitalizeFirstChar } from "../../utils/text";
 
-export default function ModalSubtitle({ modal, fileType, file, row, status }) {
+export default function ModalSubtitle({ modal, fileType, row, status }) {
+  const { subtitles } = useContext(UploadContext);
+
   // const [duration, setDuration] = useState(row?.duration || 0);
 
-  const startTime = file[row?.id - 1].start || 0;
+  const startTime = subtitles[row?.id - 1].start || 0;
 
-  const endTime = file[row?.id - 1].end || 0;
+  const endTime = subtitles[row?.id - 1].end || 0;
 
   const [text, setText] = useState(row?.text || "");
 
-  const pastEndTime = file[row?.id - 2]?.end || 0;
+  const pastEndTime = subtitles[row?.id - 2]?.end || 0;
 
-  const nextStartTime = file[row?.id]?.start || endTime;
+  const nextStartTime = subtitles[row?.id]?.start || endTime;
 
   const isFirstStartTime = row?.id - 1 === 0;
 
-  const isLastEndTime = row?.id === file.length;
+  const isLastEndTime = row?.id === subtitles.length;
 
-  const minStartTime = isFirstStartTime ? pastEndTime : pastEndTime + 1000;
+  // milliseconds precision
+  const minStartTime = isFirstStartTime ? pastEndTime : pastEndTime + 1;
 
-  const maxEndTime = isLastEndTime ? nextStartTime : nextStartTime - 1000;
+  const maxEndTime = isLastEndTime ? nextStartTime : nextStartTime - 1;
 
   const [durationSlider, setDurationSlider] = useState([startTime, endTime]);
+
+  const [startTimeSlider, endTimeSlider] = durationSlider;
 
   const handleSave = async () => {
     status.setLoading();
 
     try {
-      row["start"] = durationSlider[0];
-      row["end"] = durationSlider[1];
-      row["duration"] = durationSlider[1] - durationSlider[0];
+      row["start"] = startTimeSlider;
+      row["end"] = endTimeSlider;
+      row["duration"] = endTimeSlider - startTimeSlider;
       row["text"] = text;
 
       // row["end"] = startTime + duration;
 
-      file[row.id - 1] = row;
+      subtitles[row.id - 1] = row;
 
       await fakeRequest();
-      setSessionStorageItem("subtitles", file);
+      setSessionStorageItem("subtitles", subtitles);
 
       status.setSuccess();
       modal.close();
@@ -68,14 +74,6 @@ export default function ModalSubtitle({ modal, fileType, file, row, status }) {
       value: minStartTime,
       label: `${Math.floor(minStartTime / 1000)}s`,
     },
-    // {
-    //   value: 20,
-    //   label: '20°C',
-    // },
-    // {
-    //   value: 37,
-    //   label: '37°C',
-    // },
     {
       value: maxEndTime,
       label: `${Math.floor(maxEndTime / 1000)}s`,
@@ -125,9 +123,9 @@ export default function ModalSubtitle({ modal, fileType, file, row, status }) {
                 fullWidth
                 variant="standard"
                 size="small"
-                value={durationSlider[0]}
+                value={startTimeSlider}
                 onChange={e =>
-                  setDurationSlider([Number(e.target.value), durationSlider[1]])
+                  setDurationSlider([Number(e.target.value), endTimeSlider])
                 }
                 slotProps={{
                   input: {
@@ -155,9 +153,9 @@ export default function ModalSubtitle({ modal, fileType, file, row, status }) {
                 fullWidth
                 variant="standard"
                 size="small"
-                value={durationSlider[1]}
+                value={endTimeSlider}
                 onChange={e =>
-                  setDurationSlider([durationSlider[0], Number(e.target.value)])
+                  setDurationSlider([startTimeSlider, Number(e.target.value)])
                 }
                 slotProps={{
                   input: {
@@ -169,7 +167,7 @@ export default function ModalSubtitle({ modal, fileType, file, row, status }) {
               />
             </Grid2>
 
-            {/* Edit duration */}
+            {/* // ? Duration editing */}
             {/* <Grid2 size={8}>
               <Slider
                 value={duration}
