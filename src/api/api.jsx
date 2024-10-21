@@ -3,12 +3,8 @@ import { config } from "../../config";
 
 const { api } = config;
 
-// generic request
+// Generic Request
 const request = async (method, path) => {
-  // if (!path) {
-  //   throw new Error("API error: path is missing");
-  // }
-
   try {
     const baseUrl = api.pokemon;
 
@@ -29,3 +25,13 @@ const request = async (method, path) => {
 
 // HTTP methods
 export const get = async endpoint => request("GET", endpoint);
+
+// Simulate Request Delay
+export const fakeRequest = (timeout = 1000) => {
+  return new Promise(resolve => {
+    // simulate a 1 seconds delay (1000 ms)
+    setTimeout(() => {
+      resolve();
+    }, timeout);
+  });
+};

@@ -1,6 +1,5 @@
 import { ThemeProvider } from "@emotion/react";
 import { CssBaseline } from "@mui/material";
-import "../App.css";
 import UnauthenticatedRoutes from "../routes/UnauthenticatedRoutes";
 import theme from "../theme/theme";
 

@@ -7,4 +7,4 @@ import { get } from "./api.jsx";
  * @returns {object} // data
  */
 
-export const getSampleData = sampleData => get(`path1/${sampleData}`);
+export const getSampleData = sampleData => get(`path/${sampleData}`);

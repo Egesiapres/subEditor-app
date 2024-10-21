@@ -1,4 +1,4 @@
-export const handleKeyDown = (event, action) => {
+export const handleKeyDown = (action, event) => {
   event.key === "Enter" && action();
 };
 

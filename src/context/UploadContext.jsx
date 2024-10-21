@@ -1,5 +1,5 @@
 import { createContext, useState } from "react";
-import { getSessionStorageItem } from "../utils/sessionStorage";
+import { clearSessionStorageItems, getSessionStorageItem } from "../utils/sessionStorage";
 
 const sampleVideo = {
   id: "video-002",
@@ -23,13 +23,15 @@ const sampleVideo = {
 export const UploadContext = createContext();
 
 export const UploadContextProvider = ({ children }) => {
+  // clearSessionStorageItems();
+  
   console.log(sessionStorage);
 
   const [subtitles, setSubtitles] = useState(
-    getSessionStorageItem("subtitle") || null
+    getSessionStorageItem("subtitles") || null
   );
 
-  console.log("subtitle", subtitles);
+  console.log("subtitles", subtitles);
 
   // const [video, setVideo] = useState(sampleVideo || null);
   const [video, setVideo] = useState(null);

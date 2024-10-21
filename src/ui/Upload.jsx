@@ -1,15 +1,17 @@
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import UploadFileRoundedIcon from "@mui/icons-material/UploadFileRounded";
 import VideoFileIcon from "@mui/icons-material/VideoFile";
-import { Button, Chip, Grid2, Input, Typography } from "@mui/material";
+import { Button, Chip, Grid2, Typography } from "@mui/material";
 import { capitalizeFirstChar } from "../utils/text";
+import { useRef } from "react";
 
 export default function FileUpload({
   selectedFile,
   setSelectedFile,
   fileType,
 }) {
-  // Gestisci la selezione del file
+  const inputRef = useRef(null);
+
   const handleFileChange = e => {
     const file = e.target.files[0];
     if (file) {
@@ -17,9 +19,16 @@ export default function FileUpload({
     }
   };
 
-  const handleDelete = () => setSelectedFile(null);
+  const handleRemove = () => {
+    setSelectedFile(null);
 
-  const isSubtitle = fileType === "subtitle";
+    // input value reset
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+  };
+
+  const isSubtitles = fileType === "subtitles";
 
   return (
     <>
@@ -29,14 +38,14 @@ export default function FileUpload({
       >
         Select a {capitalizeFirstChar(fileType)} file to upload:
       </Typography>
-
-      <Input
+      
+      <input
         type="file"
         onChange={handleFileChange}
-        fullWidth
-        accept={isSubtitle ? ".srt,.vtt" : "video/*"}
-        sx={{ display: "none" }}
+        accept={isSubtitles ? ".srt" : ".mp4"}
         id={`upload-${fileType}`}
+        ref={inputRef}
+        style={{ display: "none" }}
       />
 
       <Grid2
@@ -50,10 +59,10 @@ export default function FileUpload({
             size="large"
             component="span"
             startIcon={
-              isSubtitle ? <UploadFileRoundedIcon /> : <VideoFileIcon />
+              isSubtitles ? <UploadFileRoundedIcon /> : <VideoFileIcon />
             }
           >
-            Select {isSubtitle ? ".srt" : ".mp4"} file
+            Select {isSubtitles ? ".srt" : ".mp4"} file
           </Button>
         </label>
       </Grid2>
@@ -64,10 +73,7 @@ export default function FileUpload({
           spacing={1}
           flexDirection="column"
         >
-          <Grid2
-            
-            xs={12}
-          >
+          <Grid2 size={12}>
             <Typography
               variant="body2"
               sx={{ mt: 2 }}
@@ -76,15 +82,12 @@ export default function FileUpload({
             </Typography>
           </Grid2>
 
-          <Grid2
-            
-            xs={12}
-          >
+          <Grid2 size={12}>
             <Chip
               icon={<AttachFileIcon fontSize="small" />}
               label={selectedFile.name}
               color="secondary"
-              onDelete={handleDelete}
+              onDelete={handleRemove}
             />
           </Grid2>
         </Grid2>

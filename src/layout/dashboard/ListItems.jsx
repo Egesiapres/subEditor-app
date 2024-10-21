@@ -8,7 +8,7 @@ export default function ListItems() {
   const navigate = useNavigate();
 
   const handleDashboard = () => {
-    navigate("/subtitle-editor");
+    navigate("/subtitles-editor");
   };
 
   return (
@@ -17,7 +17,7 @@ export default function ListItems() {
         <ContentCutIcon />
       </ListItemIcon>
 
-      <ListItemText primary="Subtitle Editor" />
+      <ListItemText primary="Subtitles Editor" />
     </ListItemButton>
   );
 }

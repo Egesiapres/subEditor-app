@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { useState } from "react";
-import srtParser2 from "srt-parser-2";
+import { parseSync } from "subtitle";
 import ModalCloseButton from "../ui/ModalCloseButton";
 import Upload from "../ui/Upload";
 import {
@@ -15,43 +15,44 @@ import {
   setSessionStorageItem,
 } from "../utils/sessionStorage";
 import { capitalizeFirstChar } from "../utils/text";
+import { fakeRequest } from "../api/api";
 
-export default function ModalUpload({ modal, fileType, setFile, status }) {
+export default function ModalUpload({ modal, setFile, fileType, status }) {
+  
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const handleUpload = async () => {
-    if (selectedFile) {
+  const handleUpload = () => {
+    try {
       status.setLoading();
 
       // Read file content as text
       const reader = new FileReader();
 
-      reader.onload = () => {
-        const parser = new srtParser2();
-
+      reader.onload = async () => {
         let _selectedFile = reader.result; // Obtain file content
 
-        _selectedFile = parser.fromSrt(_selectedFile); // Parse from into JSON format
+        _selectedFile = parseSync(_selectedFile); // Parse from into JSON format
 
-        _selectedFile = _selectedFile.map(
-          ({ startSeconds, endSeconds, id, startTime, endTime, text }) => {
-            // const duration = endTime - startTime;
-            const duration = endSeconds - startSeconds;
+        _selectedFile = _selectedFile
+          .map(({ data }) => data)
+          .map(({ start, end, text }, index) => {
+            const id = index + 1;
+            const duration = end - start;
 
             return {
               id,
-              startTime,
-              endTime,
+              start,
+              end,
               duration,
               text,
             };
-          }
-        );
+          });
 
-        setSessionStorageItem("subtitle", _selectedFile);
+        await fakeRequest();
+        setSessionStorageItem("subtitles", _selectedFile);
 
-        const subtitle = getSessionStorageItem("subtitle");
-        setFile(subtitle);
+        const subtitles = getSessionStorageItem("subtitles");
+        setFile(subtitles);
 
         status.setSuccess();
         modal.close();
@@ -63,13 +64,15 @@ export default function ModalUpload({ modal, fileType, setFile, status }) {
 
       // Read the file as text
       reader.readAsText(selectedFile);
+    } catch (err) {
+      status.setError(err);
     }
   };
 
   return (
     <Dialog
       open={modal.isOpen}
-      onClose={modal.close}
+      onClose={modal.close}      
     >
       <DialogTitle>
         Upload {capitalizeFirstChar(fileType)}
@@ -86,6 +89,7 @@ export default function ModalUpload({ modal, fileType, setFile, status }) {
 
       <DialogActions>
         <Button onClick={modal.close}>Cancel</Button>
+
         <LoadingButton
           onClick={handleUpload}
           variant="contained"

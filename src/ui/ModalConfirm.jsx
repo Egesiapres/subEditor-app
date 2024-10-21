@@ -6,28 +6,36 @@ import {
   DialogContent,
   DialogTitle,
 } from "@mui/material";
-import { useStatus } from "../hooks/useStatus";
+import { fakeRequest } from "../api/api";
 import ModalCloseButton from "../ui/ModalCloseButton";
-import { clearSessionStorageItem } from "../utils/sessionStorage";
 import { capitalizeFirstChar } from "../utils/text";
 
-export default function ModalConfirm({ modal, fileType, setFile, text }) {
-  const status = useStatus();
+export default function ModalConfirm({
+  modal,  
+  handleConfirm,
+  text,
+  fileType,
+  status,
+}) {
+  const handleClick = async () => {
+    try {
+      status.setLoading();
 
-  const handleDelete = async () => {
-    status.setLoading();
+      handleConfirm();
+      await fakeRequest();
 
-    clearSessionStorageItem(fileType);
-    setFile(null);
-
-    status.setSuccess();
-    modal.close();
+      status.setSuccess();
+      modal.close();
+    } catch (err) {
+      status.setError(err);
+    }
   };
 
   return (
     <Dialog
       open={modal.isOpen}
       onClose={modal.close}
+      
     >
       <DialogTitle>
         Delete {capitalizeFirstChar(fileType)}
@@ -35,18 +43,18 @@ export default function ModalConfirm({ modal, fileType, setFile, text }) {
       </DialogTitle>
 
       <DialogContent>
-        {text || "Do you really want to delete the file?"}
+        {text || "Do really want to proceed?"}
       </DialogContent>
 
       <DialogActions>
         <Button onClick={modal.close}>Cancel</Button>
         <LoadingButton
-          onClick={handleDelete}
+          onClick={handleClick}
           variant="contained"
           color="primary"
           loading={status.isLoading}
         >
-          Delete
+          Confirm
         </LoadingButton>
       </DialogActions>
     </Dialog>

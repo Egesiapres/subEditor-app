@@ -24,7 +24,7 @@ export default function VideoPlayer({ fileType, uploadStatus }) {
       controls
       src={video?.url}
       title={video?.title}
-      sx={{ minHeight: 300 }}
+      sx={{ minHeight: 250 }}
     />
   );
 
@@ -60,16 +60,15 @@ export default function VideoPlayer({ fileType, uploadStatus }) {
               component="video"
               controls
               src={video?.url}
-              title={video?.title}
-              sx={{ minHeight: 300 }}
+              title={video?.title}              
             />
 
-            <Info text="No Video detected. To play a Video, please upload an .mp4 file." />
+            <Info text="No Video file detected. To play a Video, please upload a .mp4 file." />
           </>
         )}
 
         {video && !subtitles && (
-          <Warning text="No Subtitles detected. To start editing the Subtitles, please upload a .srt file." />
+          <Warning text="No subtitles file detected. To start editing the Subtitles, please upload a .srt file." />
         )}
       </Card>
 
