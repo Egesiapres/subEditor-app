@@ -2,8 +2,8 @@ import AttachFileIcon from "@mui/icons-material/AttachFile";
 import UploadFileRoundedIcon from "@mui/icons-material/UploadFileRounded";
 import VideoFileIcon from "@mui/icons-material/VideoFile";
 import { Button, Chip, Grid2, Typography } from "@mui/material";
-import { capitalizeFirstChar } from "../utils/text";
 import { useRef } from "react";
+import { capitalizeFirstChar } from "../utils/text";
 
 export default function FileUpload({
   selectedFile,

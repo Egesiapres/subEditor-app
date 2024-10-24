@@ -16,17 +16,27 @@ import {
   Typography,
 } from "@mui/material";
 import { useContext } from "react";
+import { stringifySync } from "subtitle";
 import { fakeRequest } from "../../api/api";
-import { UploadContext } from "../../context/UploadContext";
+import { SubtitleEditorContext } from "../../context/SubtitleEditorContext";
 import CustomTypography from "../../ui/CustomTypography";
 import ModalCloseButton from "../../ui/ModalCloseButton";
-import { setSessionStorageItem } from "../../utils/sessionStorage";
+import {
+  clearSessionStorageItem,
+  setSessionStorageItem,
+} from "../../utils/sessionStorage";
 import { capitalizeFirstChar } from "../../utils/text";
 import SubtitleTableRow from "./SubtitleTableRow";
 
 export default function ModalMergeSubtitles({ modal, fileType, status }) {
-  const { subtitles, subtitlesData, selectedRows, setSelectedRows } =
-    useContext(UploadContext);
+  const {
+    subtitles,
+    setSubtitles,
+    subtitlesData: { fileName, vttUrl: oldVttUrl },
+    selectedRows,
+    setSelectedRows,
+    player,
+  } = useContext(SubtitleEditorContext);
 
   const [firstRow, secondRow] = selectedRows.sort((a, b) => a.id - b.id);
 
@@ -38,10 +48,10 @@ export default function ModalMergeSubtitles({ modal, fileType, status }) {
     duration: secondRow.end - firstRow.start,
   };
 
-  console.log("mergedRow", mergedRow);
+  // console.log("mergedRow", mergedRow);
 
   const handleSave = async () => {
-    status?.setLoading();
+    status.setLoading();
 
     try {
       let _subtitles = [...subtitles];
@@ -53,23 +63,49 @@ export default function ModalMergeSubtitles({ modal, fileType, status }) {
         ...rest,
       }));
 
-      console.log(_subtitles);
+      // Get Vtt object using crateUrlObject (as for the video file)
+      const vttContent = stringifySync(_subtitles, {
+        format: "WebVTT",
+      });
+      const vttBlob = new Blob([vttContent]);
+      const vttUrl = URL.createObjectURL(vttBlob);
 
       const _subtitlesData = {
-        ...subtitlesData,
+        vttUrl,
         fileContent: _subtitles,
+        fileName,
       };
 
-      // TODO: bug fetching data after a merge
-      // Probably the problem is still the .slice method
       await fakeRequest();
-      setSessionStorageItem("subtitles", _subtitlesData);
+
+      clearSessionStorageItem(fileType);
+      setSubtitles(null);
+
+      setSessionStorageItem(fileType, _subtitlesData);
+      setSubtitles(_subtitlesData.fileContent);
       setSelectedRows([]);
+
+      // const __subtitlesData = getSessionStorageItem("subtitles");
+      // setSubtitles(__subtitlesData.fileContent);
+
+      player.removeRemoteTextTrack(oldVttUrl);
+      player.load();
+      player.addRemoteTextTrack({
+        kind: "subtitles",
+        src: vttUrl,
+        srcLang: "en",
+        label: "English",
+        default: true,
+      });
+      player.currentTime(0);
+
+      status.setSuccess();
+      modal.close();
 
       status.setSuccess();
       modal.close();
     } catch (err) {
-      status?.setError(err);
+      status.setError(err);
     }
   };
 

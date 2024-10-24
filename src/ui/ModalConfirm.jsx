@@ -17,10 +17,11 @@ export default function ModalConfirm({
   status,
 }) {
   const handleClick = async () => {
-    try {
-      status.setLoading();
+    status.setLoading();
 
+    try {
       handleConfirm();
+      
       await fakeRequest();
 
       status.setSuccess();

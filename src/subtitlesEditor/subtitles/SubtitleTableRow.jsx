@@ -1,20 +1,29 @@
 import EditIcon from "@mui/icons-material/Edit";
-import { Checkbox, IconButton, TableCell, TableRow } from "@mui/material";
+import {
+  Button,
+  Checkbox,
+  IconButton,
+  TableCell,
+  TableRow,
+} from "@mui/material";
 import { useContext } from "react";
 import { formatTimestamp } from "subtitle";
-import { UploadContext } from "../../context/UploadContext";
+import { SubtitleEditorContext } from "../../context/SubtitleEditorContext";
 
 export default function SubtitleTableRow({
   row,
   modalSubtitle,
   isReadOnly = false,
+  isPlaying,
 }) {
-  const { selectedRows, setSelectedRows } = useContext(UploadContext);
+  const { selectedRows, setSelectedRows, setClickedTime } = useContext(
+    SubtitleEditorContext
+  );
 
   const [firstRow] = selectedRows;
 
-  const handleChange = event => {
-    const isChecked = event.target.checked;
+  const handleChange = e => {
+    const isChecked = e.target.checked;
 
     if (isChecked) {
       if (selectedRows.length < 2) {
@@ -38,7 +47,12 @@ export default function SubtitleTableRow({
     (firstRow?.id === row.id - 1 || firstRow?.id === row.id + 1);
 
   return (
-    <TableRow hover>
+    <TableRow
+      hover
+      sx={{
+        backgroundColor: isPlaying ? "#e1f5fe" : null,
+      }}
+    >
       {!isReadOnly && (
         <TableCell padding="checkbox">
           <Checkbox
@@ -54,14 +68,30 @@ export default function SubtitleTableRow({
         </TableCell>
       )}
 
-      <TableCell align="center">{row?.id}</TableCell>
-      <TableCell align="center">{formatTimestamp(row?.start)}</TableCell>
-      <TableCell align="center">{formatTimestamp(row?.end)}</TableCell>
-      <TableCell align="center">{formatTimestamp(row?.duration)}</TableCell>
+      <TableCell align="center">{row.id}</TableCell>
+      <TableCell align="center">
+        <Button
+          size="small"
+          color="secondary"
+          onClick={() => setClickedTime(row.start)}
+        >
+          {formatTimestamp(row.start)}
+        </Button>
+      </TableCell>
+      <TableCell align="center">
+        <Button
+          size="small"
+          color="secondary"
+          onClick={() => setClickedTime(row.end)}
+        >
+          {formatTimestamp(row?.end)}
+        </Button>
+      </TableCell>
+      <TableCell align="center">{formatTimestamp(row.duration)}</TableCell>
       <TableCell align="center">{row?.text}</TableCell>
 
       {!isReadOnly && (
-        <TableCell key={row?.id}>
+        <TableCell key={row.id}>
           <IconButton onClick={modalSubtitle.open}>
             <EditIcon fontSize="small" />
           </IconButton>

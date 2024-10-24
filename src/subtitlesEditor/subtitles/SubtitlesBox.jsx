@@ -1,12 +1,9 @@
-import FilePresentRoundedIcon from "@mui/icons-material/FilePresentRounded";
 import MergeIcon from "@mui/icons-material/Merge";
 import SubtitlesIcon from "@mui/icons-material/Subtitles";
 import {
   Button,
   Card,
-  Chip,
   Divider,
-  Grid2,
   Table,
   TableContainer,
   TableHead,
@@ -14,9 +11,8 @@ import {
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
-import { useContext } from "react";
-import { clearSessionStorageItem } from "../..//utils/sessionStorage";
-import { UploadContext } from "../../context/UploadContext";
+import { useContext, useEffect, useState } from "react";
+import { SubtitleEditorContext } from "../../context/SubtitleEditorContext";
 import useModal from "../../hooks/useModal";
 import { useStatus } from "../../hooks/useStatus";
 import CustomCardHeader from "../../ui/CustomCardHeader";
@@ -26,15 +22,17 @@ import Info from "../../ui/Info";
 import Loading from "../../ui/Loading";
 import ModalConfirm from "../../ui/ModalConfirm";
 import Warning from "../../ui/Warning";
+import { clearSessionStorageItem } from "../../utils/sessionStorage";
 import { capitalizeFirstChar } from "../../utils/text";
+import { secondsToMs } from "../../utils/time";
 import ModalUpload from "../ModalUpload";
 import ModalMergeSubtitles from "./ModalMergeSubtitles";
 import ModalSubtitle from "./ModalSubtitle";
 import SubtitleTableRow from "./SubtitleTableRow";
 
-export default function SubtitlesTable({ fileType }) {
+export default function SubtitlesBox({ fileType }) {
   const { subtitlesData, subtitles, setSubtitles, video, selectedRows } =
-    useContext(UploadContext);
+    useContext(SubtitleEditorContext);
 
   const subtitleStatus = useStatus();
 
@@ -59,26 +57,8 @@ export default function SubtitlesTable({ fileType }) {
           modal={
             !subtitles ? modalUploadSubtitles : modalConfirmDeleteSubtitles
           }
-          subheader={
-            <Grid2
-              container
-              spacing={1}
-              alignItems="center"
-            >
-              <Grid2>Subtitles Table {subtitlesData && "- File:"}</Grid2>
-
-              {subtitlesData && (
-                <Chip
-                  sx={{ pl: 0.5 }}
-                  icon={<FilePresentRoundedIcon fontSize="small" />}
-                  label={subtitlesData?.fileName}
-                  variant="outlined"
-                  // size="small"
-                  color="primary"
-                />
-              )}
-            </Grid2>
-          }
+          subheader="Subtitles Data"
+          fileData={subtitlesData}
           avatar={
             <SubtitlesIcon
               fontSize="small"
@@ -86,6 +66,7 @@ export default function SubtitlesTable({ fileType }) {
             />
           }
           isUpload={!subtitles}
+          isDisabled={!video}
           secondButton={
             <Button
               variant="contained"
@@ -105,13 +86,15 @@ export default function SubtitlesTable({ fileType }) {
         ) : subtitleStatus.error ? (
           <Error error={subtitleStatus.error} />
         ) : subtitles ? (
-          <CustomTableContent
+          <SubtitleTable
             subtitles={subtitles}
             fileType={fileType}
             selectedRows={selectedRows}
           />
+        ) : video ? (
+          <Info text="No Subtitles file detected. To see Subtitles details, please upload a .srt file." />
         ) : (
-          <Info text="No Subtitles file detected. To see Subtitles details, upload a .srt file." />
+          <Info text="No Video file detected. To see Subtitles details, please upload Video file first." />
         )}
 
         {subtitles && !video && (
@@ -148,60 +131,91 @@ export default function SubtitlesTable({ fileType }) {
   );
 }
 
-const CustomTableContent = ({ subtitles, fileType, selectedRows }) => (
-  <>
-    <TableContainer>
-      <Table>
-        <TableHead>
-          {selectedRows.length < 2 && (
+const SubtitleTable = ({ subtitles, fileType, selectedRows }) => {
+  const { player } = useContext(SubtitleEditorContext);
+
+  const [currentSubtitleIndex, setCurrentSubtitleIndex] = useState(-1);
+
+  useEffect(() => {
+    if (player) {
+      const updateCurrentSubtitle = () => {
+        const currentTime = secondsToMs(player?.currentTime());
+
+        // Find the current Subtitle Row Index
+        const index = subtitles.findIndex(
+          subtitle =>
+            currentTime >= subtitle.start && currentTime <= subtitle.end
+        );
+
+        setCurrentSubtitleIndex(index);
+      };
+
+      // Update the Index every time the time changes
+      player.on("timeupdate", updateCurrentSubtitle);
+
+      // Cleanup event listeners
+      return () => {
+        player.off("timeupdate", updateCurrentSubtitle);
+      };
+    }
+  }, [player, subtitles]);
+
+  return (
+    <>
+      <TableContainer>
+        <Table>
+          <TableHead>
+            {selectedRows.length < 2 && (
+              <TableRow>
+                <TableCell
+                  colSpan={7}
+                  sx={{ p: 0 }}
+                >
+                  {selectedRows.length === 1 ? (
+                    <Info text="Pease select one more Row." />
+                  ) : (
+                    <Info text="To perform a merge, please select two consecutive Rows." />
+                  )}
+                </TableCell>
+              </TableRow>
+            )}
+
             <TableRow>
-              <TableCell
-                colSpan={7}
-                sx={{ p: 0 }}
-              >
-                {selectedRows.length === 1 ? (
-                  <Info text="Pease select one more Row." />
-                ) : (
-                  <Info text="To perform a merge, please select two consecutive Rows." />
-                )}
-              </TableCell>
+              <TableCell />
+
+              {Object.keys(subtitles[0]).map((header, index) => (
+                <TableCell key={index}>
+                  <CustomTypography variant="body2">
+                    {header === "id"
+                      ? "#"
+                      : header === "duration"
+                      ? `${capitalizeFirstChar(header)} (ms)`
+                      : capitalizeFirstChar(header)}
+                  </CustomTypography>
+                </TableCell>
+              ))}
+
+              <TableCell />
             </TableRow>
-          )}
+          </TableHead>
 
-          <TableRow>
-            <TableCell />
-
-            {Object.keys(subtitles[0]).map((header, index) => (
-              <TableCell key={index}>
-                <CustomTypography variant="body2">
-                  {header === "id"
-                    ? "#"
-                    : header === "duration"
-                    ? `${capitalizeFirstChar(header)} (ms)`
-                    : capitalizeFirstChar(header)}
-                </CustomTypography>
-              </TableCell>
+          <TableBody>
+            {subtitles.map((subtitleRow, index) => (
+              <CustomTableRow
+                key={index}
+                row={subtitleRow}
+                fileType={fileType}
+                isPlaying={index === currentSubtitleIndex}
+              />
             ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
+  );
+};
 
-            <TableCell />
-          </TableRow>
-        </TableHead>
-
-        <TableBody>
-          {subtitles.map((subtitleRow, index) => (
-            <CustomTableRow
-              key={index}
-              row={subtitleRow}
-              fileType={fileType}
-            />
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  </>
-);
-
-const CustomTableRow = ({ row, fileType }) => {
+const CustomTableRow = ({ row, fileType, isPlaying }) => {
   const rowStatus = useStatus();
 
   const modalSubtitle = useModal();
@@ -223,6 +237,7 @@ const CustomTableRow = ({ row, fileType }) => {
         <SubtitleTableRow
           row={row}
           modalSubtitle={modalSubtitle}
+          isPlaying={isPlaying}
         />
       )}
 

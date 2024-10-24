@@ -12,14 +12,24 @@ import {
   Typography,
 } from "@mui/material";
 import { useContext, useState } from "react";
+import { stringifySync } from "subtitle";
 import { fakeRequest } from "../../api/api";
-import { UploadContext } from "../../context/UploadContext";
+import { SubtitleEditorContext } from "../../context/SubtitleEditorContext";
 import ModalCloseButton from "../../ui/ModalCloseButton";
-import { setSessionStorageItem } from "../../utils/sessionStorage";
+import {
+  clearSessionStorageItem,
+  setSessionStorageItem,
+} from "../../utils/sessionStorage";
 import { capitalizeFirstChar } from "../../utils/text";
+import { msToSeconds } from "../../utils/time";
 
 export default function ModalSubtitle({ modal, fileType, row, status }) {
-  const { subtitles, subtitlesData } = useContext(UploadContext);
+  const {
+    subtitles,
+    setSubtitles,
+    subtitlesData: { fileName, vttUrl: oldVttUrl },
+    player,
+  } = useContext(SubtitleEditorContext);
 
   // const [duration, setDuration] = useState(row?.duration || 0);
 
@@ -37,7 +47,6 @@ export default function ModalSubtitle({ modal, fileType, row, status }) {
 
   const isLastEndTime = row?.id === subtitles.length;
 
-  // milliseconds precision
   const minStartTime = isFirstStartTime ? pastEndTime : pastEndTime + 1;
 
   const maxEndTime = isLastEndTime ? nextStartTime : nextStartTime - 1;
@@ -59,13 +68,41 @@ export default function ModalSubtitle({ modal, fileType, row, status }) {
 
       subtitles[row.id - 1] = row;
 
+      // Get Vtt object using crateUrlObject (as for the video file)
+      const vttContent = stringifySync(subtitles, {
+        format: "WebVTT",
+      });
+      const vttBlob = new Blob([vttContent]);
+      const vttUrl = URL.createObjectURL(vttBlob);
+
+      console.log("oldVttUrl", oldVttUrl);
+
       const _subtitlesData = {
-        ...subtitlesData,
+        vttUrl,
         fileContent: subtitles,
+        fileName,
       };
 
+      console.log("_subtitlesData", _subtitlesData);
+
       await fakeRequest();
-      setSessionStorageItem("subtitles", _subtitlesData);
+
+      clearSessionStorageItem(fileType);
+      setSubtitles(null);
+
+      setSessionStorageItem(fileType, _subtitlesData);
+      setSubtitles(_subtitlesData.fileContent);
+
+      player.removeRemoteTextTrack(oldVttUrl);
+      player.load();
+      player.addRemoteTextTrack({
+        kind: "subtitles",
+        src: vttUrl,
+        srcLang: "en",
+        label: "English",
+        default: true,
+      });
+      player.currentTime(0);
 
       status.setSuccess();
       modal.close();
@@ -74,14 +111,16 @@ export default function ModalSubtitle({ modal, fileType, row, status }) {
     }
   };
 
+  const isDecimals = true;
+
   const marks = [
     {
       value: minStartTime,
-      label: `${Math.floor(minStartTime / 1000)}s`,
+      label: `${msToSeconds(minStartTime, isDecimals)}s`,
     },
     {
       value: maxEndTime,
-      label: `${Math.floor(maxEndTime / 1000)}s`,
+      label: `${msToSeconds(maxEndTime, isDecimals)}s`,
     },
   ];
 
@@ -90,7 +129,6 @@ export default function ModalSubtitle({ modal, fileType, row, status }) {
       open={modal.isOpen}
       onClose={modal.close}
       fullWidth
-      // maxWidth="sm"
       maxWidth="sm"
     >
       <DialogTitle>
@@ -113,8 +151,8 @@ export default function ModalSubtitle({ modal, fileType, row, status }) {
               // variant="body2"
               // sx={{ mb: -1.5 }}
             >
-              You can edit the duration acting on the start/end time of a
-              subtitle:
+              You can change the duration editing the start/end time, and the
+              text of a Subtitle:
             </Typography>
           </Grid2>
 
@@ -129,9 +167,13 @@ export default function ModalSubtitle({ modal, fileType, row, status }) {
                 variant="standard"
                 size="small"
                 value={startTimeSlider}
-                onChange={e =>
-                  setDurationSlider([Number(e.target.value), endTimeSlider])
-                }
+                onChange={e => {
+                  const value = Number(e.target.value);
+
+                  if (value >= minStartTime && value < endTimeSlider) {
+                    setDurationSlider([value, endTimeSlider]);
+                  }
+                }}
                 slotProps={{
                   input: {
                     endAdornment: (
@@ -145,7 +187,7 @@ export default function ModalSubtitle({ modal, fileType, row, status }) {
             <Grid2 size={7}>
               <Slider
                 value={durationSlider}
-                onChange={(event, value) => setDurationSlider(value)}
+                onChange={(e, value) => setDurationSlider(value)}
                 min={minStartTime}
                 max={maxEndTime}
                 marks={marks}
@@ -159,9 +201,13 @@ export default function ModalSubtitle({ modal, fileType, row, status }) {
                 variant="standard"
                 size="small"
                 value={endTimeSlider}
-                onChange={e =>
-                  setDurationSlider([startTimeSlider, Number(e.target.value)])
-                }
+                onChange={e => {
+                  const value = Number(e.target.value);
+
+                  if (value <= maxEndTime) {
+                    setDurationSlider([startTimeSlider, value]);
+                  }
+                }}
                 slotProps={{
                   input: {
                     endAdornment: (
@@ -172,7 +218,7 @@ export default function ModalSubtitle({ modal, fileType, row, status }) {
               />
             </Grid2>
 
-            {/* // ? Duration editing */}
+            {/* // ? Easier duration editing */}
             {/* <Grid2 size={8}>
               <Slider
                 value={duration}

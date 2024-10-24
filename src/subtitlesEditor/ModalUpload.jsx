@@ -7,9 +7,9 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { useContext, useState } from "react";
-import { parseSync } from "subtitle";
+import { parseSync, stringifySync } from "subtitle";
 import { fakeRequest } from "../api/api";
-import { UploadContext } from "../context/UploadContext";
+import { SubtitleEditorContext } from "../context/SubtitleEditorContext";
 import ModalCloseButton from "../ui/ModalCloseButton";
 import Upload from "../ui/Upload";
 import {
@@ -19,14 +19,16 @@ import {
 import { capitalizeFirstChar } from "../utils/text";
 
 export default function ModalUpload({ modal, fileType, status }) {
-  const { setSubtitles } = useContext(UploadContext);
+  const { setSubtitles, setVideo } = useContext(SubtitleEditorContext);
 
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const handleUpload = () => {
-    try {
-      status.setLoading();
+  const isSubtitles = fileType === "subtitles";
 
+  const handleSubtitleUpload = () => {
+    status.setLoading();
+
+    try {
       // Read file content as text
       const reader = new FileReader();
 
@@ -36,6 +38,13 @@ export default function ModalUpload({ modal, fileType, status }) {
 
         // Parse from into JSON format
         _selectedFileContent = parseSync(_selectedFileContent);
+
+        // Get Vtt object using crateUrlObject (as for the video file)
+        const vttContent = stringifySync(_selectedFileContent, {
+          format: "WebVTT",
+        });
+        const vttBlob = new Blob([vttContent]);
+        const vttUrl = URL.createObjectURL(vttBlob);
 
         _selectedFileContent = _selectedFileContent
           .map(({ data }) => data)
@@ -53,15 +62,15 @@ export default function ModalUpload({ modal, fileType, status }) {
           });
 
         const _subtitlesData = {
+          vttUrl,
           fileName: selectedFile.name,
           fileContent: _selectedFileContent,
         };
 
         await fakeRequest();
+        
         setSessionStorageItem("subtitles", _subtitlesData);
-
-        const subtitlesData = getSessionStorageItem("subtitles");
-        setSubtitles(subtitlesData.fileContent);
+        setSubtitles(_subtitlesData.fileContent);
 
         status.setSuccess();
         modal.close();
@@ -73,6 +82,31 @@ export default function ModalUpload({ modal, fileType, status }) {
 
       // Read the file as text
       reader.readAsText(selectedFile);
+    } catch (err) {
+      status.setError(err);
+    }
+  };
+
+  const handleVideoUpload = async () => {
+    status.setLoading();
+
+    try {
+      // Create a temporary URL for the video
+      const url = URL.createObjectURL(selectedFile);
+
+      const _videoData = {
+        fileName: selectedFile.name,
+        fileUrl: url,
+      };
+
+      await fakeRequest(2000);
+      setSessionStorageItem("video", _videoData);
+
+      const videoData = getSessionStorageItem("video");
+      setVideo(videoData.fileUrl);
+
+      status.setSuccess();
+      modal.close();
     } catch (err) {
       status.setError(err);
     }
@@ -100,7 +134,7 @@ export default function ModalUpload({ modal, fileType, status }) {
         <Button onClick={modal.close}>Cancel</Button>
 
         <LoadingButton
-          onClick={handleUpload}
+          onClick={isSubtitles ? handleSubtitleUpload : handleVideoUpload}
           variant="contained"
           color="primary"
           loading={status.isLoading}

@@ -51,7 +51,11 @@ export const useStatus = () => {
   const setSuccess = success =>
     dispatch({ type: "STATUS_SUCCESS", payload: success });
 
-  const setError = error => dispatch({ type: "STATUS_ERROR", payload: error });
+  const setError = error => {
+    dispatch({ type: "STATUS_ERROR", payload: error });
+    
+    console.error(error);
+  };
 
   return { ...state, reset, setLoading, setSuccess, setError };
 };
