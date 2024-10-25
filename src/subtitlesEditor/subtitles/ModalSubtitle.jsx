@@ -25,11 +25,14 @@ import { msToSeconds } from "../../utils/time";
 
 export default function ModalSubtitle({ modal, fileType, row, status }) {
   const {
-    subtitles,
-    setSubtitles,
-    subtitlesData: { fileName, vttUrl: oldVttUrl },
+    // subtitles,
+    // setSubtitles,
+    subtitlesData,
+    setSubtitlesData,
     player,
   } = useContext(SubtitleEditorContext);
+
+  const { subtitles } = subtitlesData;
 
   // const [duration, setDuration] = useState(row?.duration || 0);
 
@@ -73,35 +76,38 @@ export default function ModalSubtitle({ modal, fileType, row, status }) {
         format: "WebVTT",
       });
       const vttBlob = new Blob([vttContent]);
-      const vttUrl = URL.createObjectURL(vttBlob);
 
-      console.log("oldVttUrl", oldVttUrl);
+      console.log("oldUrl", subtitlesData.url);
 
       const _subtitlesData = {
-        vttUrl,
-        fileContent: subtitles,
-        fileName,
+        name: subtitlesData.name,
+        url: URL.createObjectURL(vttBlob),
+        subtitles,
       };
 
-      console.log("_subtitlesData", _subtitlesData);
+      console.log("_subtitlesData", _subtitlesData, "subtitles", subtitles);
 
       await fakeRequest();
 
       clearSessionStorageItem(fileType);
-      setSubtitles(null);
+      setSubtitlesData(null);
+
+      // TODO: BUG: player subtitles do not update
+      const remoteTextTracks = player.remoteTextTracks();
+      player.removeRemoteTextTrack(remoteTextTracks[0]);
 
       setSessionStorageItem(fileType, _subtitlesData);
-      setSubtitles(_subtitlesData.fileContent);
-
-      player.removeRemoteTextTrack(oldVttUrl);
-      player.load();
+      setSubtitlesData(_subtitlesData);
+      
       player.addRemoteTextTrack({
         kind: "subtitles",
-        src: vttUrl,
+        src: _subtitlesData.url,
         srcLang: "en",
         label: "English",
         default: true,
       });
+
+      player.load();
       player.currentTime(0);
 
       status.setSuccess();

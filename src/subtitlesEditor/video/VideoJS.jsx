@@ -34,7 +34,12 @@ export default function VideoJS({ options, onReady }) {
       player.autoplay(options.autoplay);
       player.src(options.sources);
 
-      options.tracks && player.addRemoteTextTrack(options.tracks[0]);
+      if (options.tracks) {
+        player.addRemoteTextTrack(options.tracks[0]);
+      }
+
+      const remoteTextTracks = player.remoteTextTracks();
+      console.log("remoteTextTracks", remoteTextTracks);
 
       player.currentTime(msToSeconds(clickedTime));
     }

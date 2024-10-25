@@ -1,7 +1,7 @@
 import { Container, Grid2 } from "@mui/material";
 import { SubtitleEditorContextProvider } from "../context/SubtitleEditorContext";
 import { useStatus } from "../hooks/useStatus";
-import AudioBox from "./AudioBox";
+import AudioBox from "./audio/AudioBox";
 import SubtitleBox from "./subtitles/SubtitlesBox";
 import VideoBox from "./video/VideoBox";
 

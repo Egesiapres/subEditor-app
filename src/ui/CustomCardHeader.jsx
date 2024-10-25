@@ -29,7 +29,7 @@ export default function CustomCardHeader({
             <Chip
               sx={{ pl: 0.5 }}
               icon={<FilePresentRoundedIcon fontSize="small" />}
-              label={fileData?.fileName}
+              label={fileData?.name}
               variant="outlined"
               // size="small"
               color="primary"

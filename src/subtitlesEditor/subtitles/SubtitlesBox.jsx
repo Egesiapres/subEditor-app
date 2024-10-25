@@ -31,8 +31,13 @@ import ModalSubtitle from "./ModalSubtitle";
 import SubtitleTableRow from "./SubtitleTableRow";
 
 export default function SubtitlesBox({ fileType }) {
-  const { subtitlesData, subtitles, setSubtitles, video, selectedRows } =
-    useContext(SubtitleEditorContext);
+  const {
+    subtitlesData,
+    setSubtitlesData,
+    videoData,
+    selectedRows,
+    // player,
+  } = useContext(SubtitleEditorContext);
 
   const subtitleStatus = useStatus();
 
@@ -44,7 +49,9 @@ export default function SubtitlesBox({ fileType }) {
 
   const handleConfirmDeleteSubtitles = () => {
     clearSessionStorageItem(fileType);
-    setSubtitles(null);
+    setSubtitlesData(null);
+    
+    // player.removeRemoteTextTrack(subtitlesData?.url);
   };
 
   return (
@@ -55,7 +62,7 @@ export default function SubtitlesBox({ fileType }) {
       >
         <CustomCardHeader
           modal={
-            !subtitles ? modalUploadSubtitles : modalConfirmDeleteSubtitles
+            !subtitlesData ? modalUploadSubtitles : modalConfirmDeleteSubtitles
           }
           subheader="Subtitles Data"
           fileData={subtitlesData}
@@ -65,8 +72,8 @@ export default function SubtitlesBox({ fileType }) {
               color="action"
             />
           }
-          isUpload={!subtitles}
-          isDisabled={!video}
+          isUpload={!subtitlesData}
+          isDisabled={!videoData}
           secondButton={
             <Button
               variant="contained"
@@ -85,19 +92,19 @@ export default function SubtitlesBox({ fileType }) {
           <Loading />
         ) : subtitleStatus.error ? (
           <Error error={subtitleStatus.error} />
-        ) : subtitles ? (
+        ) : subtitlesData ? (
           <SubtitleTable
-            subtitles={subtitles}
+            subtitles={subtitlesData?.subtitles}
             fileType={fileType}
             selectedRows={selectedRows}
           />
-        ) : video ? (
+        ) : videoData ? (
           <Info text="No Subtitles file detected. To see Subtitles details, please upload a .srt file." />
         ) : (
           <Info text="No Video file detected. To see Subtitles details, please upload Video file first." />
         )}
 
-        {subtitles && !video && (
+        {subtitlesData && !videoData && (
           <Warning text="No Video file detected. To display the Subtitles, please upload a .mp4 file." />
         )}
       </Card>

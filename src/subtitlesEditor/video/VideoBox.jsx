@@ -1,6 +1,6 @@
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import { Card, Divider } from "@mui/material";
-import { useContext, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import videojs from "video.js";
 import { SubtitleEditorContext } from "../../context/SubtitleEditorContext";
 import useModal from "../../hooks/useModal";
@@ -16,7 +16,7 @@ import ModalUpload from "../ModalUpload";
 import VideoJS from "./VideoJS";
 
 export default function VideoBox({ fileType, videoStatus }) {
-  const { videoData, video, setVideo, subtitles, subtitlesData } = useContext(
+  const { videoData, setVideoData, subtitlesData } = useContext(
     SubtitleEditorContext
   );
 
@@ -32,20 +32,20 @@ export default function VideoBox({ fileType, videoStatus }) {
     controls: true,
     responsive: true,
     fluid: true,
-    ...(video && {
+    ...(videoData && {
       sources: [
         {
-          src: video,
+          src: videoData.url,
           type: `video/mp4`,
         },
       ],
     }),
-    ...(subtitles && {
+    ...(subtitlesData && {
       tracks: [
         {
           kind: "subtitles",
-          src: subtitlesData?.vttUrl || "",
-          srcLang: "en",
+          src: subtitlesData.url,
+          srclang: "en",
           label: "English",
           default: true,
         },
@@ -53,7 +53,10 @@ export default function VideoBox({ fileType, videoStatus }) {
     }),
   };
 
-  // console.log("videoJsOptions", videoJsOptions);
+  useEffect(() => {
+    subtitlesData && console.log("videoJsOptions", videoJsOptions);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subtitlesData]);
 
   const handlePlayerReady = player => {
     playerRef.current = player;
@@ -74,14 +77,14 @@ export default function VideoBox({ fileType, videoStatus }) {
 
   const handleConfirmDeleteVideo = () => {
     clearSessionStorageItem(fileType);
-    setVideo(null);
+    setVideoData(null);
   };
 
   return (
     <>
       <Card variant="outlined">
         <CustomCardHeader
-          modal={!video ? modalUploadVideo : modalConfirmDeleteVideo}
+          modal={!videoData ? modalUploadVideo : modalConfirmDeleteVideo}
           subheader="Video Player"
           fileData={videoData}
           avatar={
@@ -90,7 +93,7 @@ export default function VideoBox({ fileType, videoStatus }) {
               color="action"
             />
           }
-          isUpload={!video}
+          isUpload={!videoData}
         />
 
         <Divider />
@@ -99,7 +102,7 @@ export default function VideoBox({ fileType, videoStatus }) {
           <Loading />
         ) : videoStatus.error ? (
           <Error error={videoStatus.error} />
-        ) : video ? (
+        ) : videoData ? (
           <VideoJS
             options={videoJsOptions}
             onReady={handlePlayerReady}
@@ -112,7 +115,7 @@ export default function VideoBox({ fileType, videoStatus }) {
           </>
         )}
 
-        {video && !subtitles && (
+        {videoData && !subtitlesData && (
           <Warning text="No Subtitles file detected. To start editing the Subtitles, please upload a .srt file." />
         )}
       </Card>
@@ -120,7 +123,7 @@ export default function VideoBox({ fileType, videoStatus }) {
       {modalUploadVideo.isOpen && (
         <ModalUpload
           modal={modalUploadVideo}
-          fileType="Video"
+          fileType={fileType}
           status={videoStatus}
         />
       )}

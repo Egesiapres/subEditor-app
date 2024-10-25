@@ -1,3 +1,5 @@
+// import { FFmpeg } from "@ffmpeg/ffmpeg";
+// import { fetchFile } from "@ffmpeg/util";
 import { LoadingButton } from "@mui/lab";
 import {
   Button,
@@ -12,14 +14,17 @@ import { fakeRequest } from "../api/api";
 import { SubtitleEditorContext } from "../context/SubtitleEditorContext";
 import ModalCloseButton from "../ui/ModalCloseButton";
 import Upload from "../ui/Upload";
-import {
-  getSessionStorageItem,
-  setSessionStorageItem,
-} from "../utils/sessionStorage";
+import { setSessionStorageItem } from "../utils/sessionStorage";
 import { capitalizeFirstChar } from "../utils/text";
 
+// const ffmpeg = new FFmpeg({ log: true });
+
 export default function ModalUpload({ modal, fileType, status }) {
-  const { setSubtitles, setVideo } = useContext(SubtitleEditorContext);
+  const {
+    setSubtitlesData,
+    setVideoData,
+    // setAudioData    
+  } = useContext(SubtitleEditorContext);
 
   const [selectedFile, setSelectedFile] = useState(null);
 
@@ -36,7 +41,7 @@ export default function ModalUpload({ modal, fileType, status }) {
         // Obtain file content
         let _selectedFileContent = reader.result;
 
-        // Parse from into JSON format
+        // Parse into JSON format
         _selectedFileContent = parseSync(_selectedFileContent);
 
         // Get Vtt object using crateUrlObject (as for the video file)
@@ -44,7 +49,6 @@ export default function ModalUpload({ modal, fileType, status }) {
           format: "WebVTT",
         });
         const vttBlob = new Blob([vttContent]);
-        const vttUrl = URL.createObjectURL(vttBlob);
 
         _selectedFileContent = _selectedFileContent
           .map(({ data }) => data)
@@ -62,15 +66,15 @@ export default function ModalUpload({ modal, fileType, status }) {
           });
 
         const _subtitlesData = {
-          vttUrl,
-          fileName: selectedFile.name,
-          fileContent: _selectedFileContent,
+          name: selectedFile.name,
+          url: URL.createObjectURL(vttBlob),
+          subtitles: _selectedFileContent,
         };
 
         await fakeRequest();
-        
-        setSessionStorageItem("subtitles", _subtitlesData);
-        setSubtitles(_subtitlesData.fileContent);
+
+        setSessionStorageItem(fileType, _subtitlesData);
+        setSubtitlesData(_subtitlesData);
 
         status.setSuccess();
         modal.close();
@@ -91,19 +95,49 @@ export default function ModalUpload({ modal, fileType, status }) {
     status.setLoading();
 
     try {
-      // Create a temporary URL for the video
-      const url = URL.createObjectURL(selectedFile);
+      // const videoBlob = new Blob([selectedFile]);
 
       const _videoData = {
-        fileName: selectedFile.name,
-        fileUrl: url,
+        name: selectedFile.name,
+        // url: URL.createObjectURL(videoBlob),
+        url: URL.createObjectURL(selectedFile),        
       };
 
       await fakeRequest(2000);
-      setSessionStorageItem("video", _videoData);
 
-      const videoData = getSessionStorageItem("video");
-      setVideo(videoData.fileUrl);
+      // Upload the Video
+      setSessionStorageItem(fileType, _videoData);
+      setVideoData(_videoData);
+
+      // ! Transform the .mp4 file & Upload Audio
+      // await ffmpeg.load();
+
+      // // Upload the Video file
+      // await ffmpeg.writeFile("input.mp4", await fetchFile(_videoData.url));
+
+      // // Execute the cmd to extract the audio in .mp3 format
+      // await ffmpeg.run(
+      //   "-i",
+      //   _videoData.url,
+      //   "-q:a",
+      //   "0",
+      //   "-map",
+      //   "a",
+      //   "audio.mp3"
+      // );
+
+      // // GEt the extracted Audio
+      // const _audio = await ffmpeg.readFile("audio.mp3");
+
+      // const audioBlob = new Blob([_audio.buffer], { type: "audio/mp3" });
+
+      // const _audioData = {
+      //   name: _audio.name,
+      //   url: URL.createObjectURL(audioBlob),
+      // };
+
+      // setSessionStorageItem("audio", _audioData);
+      // setAudio(_audioData);
 
       status.setSuccess();
       modal.close();

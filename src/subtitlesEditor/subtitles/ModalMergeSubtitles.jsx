@@ -30,13 +30,16 @@ import SubtitleTableRow from "./SubtitleTableRow";
 
 export default function ModalMergeSubtitles({ modal, fileType, status }) {
   const {
-    subtitles,
-    setSubtitles,
-    subtitlesData: { fileName, vttUrl: oldVttUrl },
+    // subtitles,
+    // setSubtitles,
+    subtitlesData,
+    setSubtitlesData,
     selectedRows,
     setSelectedRows,
     player,
   } = useContext(SubtitleEditorContext);
+
+  const { name, subtitles } = subtitlesData;
 
   const [firstRow, secondRow] = selectedRows.sort((a, b) => a.id - b.id);
 
@@ -68,35 +71,35 @@ export default function ModalMergeSubtitles({ modal, fileType, status }) {
         format: "WebVTT",
       });
       const vttBlob = new Blob([vttContent]);
-      const vttUrl = URL.createObjectURL(vttBlob);
 
       const _subtitlesData = {
-        vttUrl,
-        fileContent: _subtitles,
-        fileName,
+        name,
+        url: URL.createObjectURL(vttBlob),
+        subtitles: _subtitles,
       };
 
       await fakeRequest();
 
       clearSessionStorageItem(fileType);
-      setSubtitles(null);
+      setSubtitlesData(null);
+
+      // TODO: BUG: player subtitles do not update
+      const remoteTextTracks = player.remoteTextTracks();
+      player.removeRemoteTextTrack(remoteTextTracks[0]);
 
       setSessionStorageItem(fileType, _subtitlesData);
-      setSubtitles(_subtitlesData.fileContent);
+      setSubtitlesData(_subtitlesData);
       setSelectedRows([]);
 
-      // const __subtitlesData = getSessionStorageItem("subtitles");
-      // setSubtitles(__subtitlesData.fileContent);
-
-      player.removeRemoteTextTrack(oldVttUrl);
-      player.load();
       player.addRemoteTextTrack({
         kind: "subtitles",
-        src: vttUrl,
+        src: _subtitlesData.url,
         srcLang: "en",
         label: "English",
         default: true,
       });
+
+      player.load();
       player.currentTime(0);
 
       status.setSuccess();

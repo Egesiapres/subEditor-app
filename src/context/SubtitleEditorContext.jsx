@@ -1,55 +1,47 @@
-import { createContext, useRef, useState } from "react";
+import { createContext, useState } from "react";
+import videojs from "video.js";
 import {
   // eslint-disable-next-line no-unused-vars
   clearSessionStorageItems,
   getSessionStorageItem,
 } from "../utils/sessionStorage";
-import videojs from "video.js";
 
 export const SubtitleEditorContext = createContext();
 
 export const SubtitleEditorContextProvider = ({ children }) => {
   // clearSessionStorageItems();
 
-  const subtitlesData = getSessionStorageItem("subtitles");
-  const videoData = getSessionStorageItem("video");
+  const _subtitlesData = getSessionStorageItem("subtitles");
+  const _videoData = getSessionStorageItem("Video");
+  const _audioData = getSessionStorageItem("audio");
 
   console.log(sessionStorage);
 
-  const [subtitles, setSubtitles] = useState(
-    subtitlesData?.fileContent || null
-  );
+  const [subtitlesData, setSubtitlesData] = useState(_subtitlesData || null);
+  const [videoData, setVideoData] = useState(_videoData || "");
+  const [audioData, setAudioData] = useState(_audioData || "");
 
   const [selectedRows, setSelectedRows] = useState([]);
 
-  const [video, setVideo] = useState(videoData?.fileUrl || "");
-
-  const playerRef = useRef(null);
-
   const player = videojs?.players?.video_js;
-  console.log("player", player);
-
-  const [audio, setAudio] = useState(null);
+  // console.log("player", player);
 
   const [clickedTime, setClickedTime] = useState(null);
 
   const value = {
     subtitlesData,
     videoData,
-
-    subtitles,
+    audioData,
     selectedRows,
-    video,
-    audio,
-    setSubtitles,
+    clickedTime,
+
+    setSubtitlesData,
+    setVideoData,
+    setAudioData,
     setSelectedRows,
-    setVideo,
-    setAudio,
+    setClickedTime,
 
     player,
-    playerRef,
-    clickedTime,
-    setClickedTime,
   };
 
   return (
