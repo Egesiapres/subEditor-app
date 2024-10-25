@@ -15,7 +15,7 @@ export default function AudioWave({ audioData }) {
         url: audioData?.url,
       });
 
-      wavesurferRef.current.load(audioData.url);
+      wavesurferRef.current.load(audioData?.url);
     }
 
     return () => {
