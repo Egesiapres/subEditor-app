@@ -12,7 +12,7 @@ export default function AudioWave({ audioData }) {
         container: waveformRef.current,
         waveColor: "#4F4A85",
         progressColor: "#383351",
-        url: audioData.url,
+        url: audioData?.url,
       });
 
       wavesurferRef.current.load(audioData.url);
