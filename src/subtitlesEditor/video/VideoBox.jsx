@@ -54,9 +54,9 @@ export default function VideoBox({ fileType, videoStatus }) {
   };
 
   useEffect(() => {
-    subtitlesData && console.log("videoJsOptions", videoJsOptions);
+    console.log("videoJsOptions", videoJsOptions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subtitlesData]);
+  }, [subtitlesData, videoData]);
 
   const handlePlayerReady = player => {
     playerRef.current = player;

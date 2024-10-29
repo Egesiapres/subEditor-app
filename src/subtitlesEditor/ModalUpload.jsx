@@ -23,7 +23,7 @@ export default function ModalUpload({ modal, fileType, status }) {
   const {
     setSubtitlesData,
     setVideoData,
-    // setAudioData    
+    // setAudioData
   } = useContext(SubtitleEditorContext);
 
   const [selectedFile, setSelectedFile] = useState(null);
@@ -48,6 +48,7 @@ export default function ModalUpload({ modal, fileType, status }) {
         const vttContent = stringifySync(_selectedFileContent, {
           format: "WebVTT",
         });
+
         const vttBlob = new Blob([vttContent]);
 
         _selectedFileContent = _selectedFileContent
@@ -100,7 +101,7 @@ export default function ModalUpload({ modal, fileType, status }) {
       const _videoData = {
         name: selectedFile.name,
         // url: URL.createObjectURL(videoBlob),
-        url: URL.createObjectURL(selectedFile),        
+        url: URL.createObjectURL(selectedFile),
       };
 
       await fakeRequest(2000);

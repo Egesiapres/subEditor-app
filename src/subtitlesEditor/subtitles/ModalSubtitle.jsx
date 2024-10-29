@@ -71,13 +71,17 @@ export default function ModalSubtitle({ modal, fileType, row, status }) {
 
       subtitles[row.id - 1] = row;
 
+      const formattedSubtitles = subtitles.map(({ start, end, text }) => ({
+        data: { start, end, text },
+        type: "cue",
+      }));
+
       // Get Vtt object using crateUrlObject (as for the video file)
-      const vttContent = stringifySync(subtitles, {
+      const vttContent = stringifySync(formattedSubtitles, {
         format: "WebVTT",
       });
-      const vttBlob = new Blob([vttContent]);
 
-      console.log("oldUrl", subtitlesData.url);
+      const vttBlob = new Blob([vttContent]);
 
       const _subtitlesData = {
         name: subtitlesData.name,
@@ -92,23 +96,13 @@ export default function ModalSubtitle({ modal, fileType, row, status }) {
       clearSessionStorageItem(fileType);
       setSubtitlesData(null);
 
-      // TODO: BUG: player subtitles do not update
       const remoteTextTracks = player.remoteTextTracks();
       player.removeRemoteTextTrack(remoteTextTracks[0]);
 
       setSessionStorageItem(fileType, _subtitlesData);
       setSubtitlesData(_subtitlesData);
-      
-      player.addRemoteTextTrack({
-        kind: "subtitles",
-        src: _subtitlesData.url,
-        srcLang: "en",
-        label: "English",
-        default: true,
-      });
 
-      player.load();
-      player.currentTime(0);
+      // player.currentTime(startTimeSlider);
 
       status.setSuccess();
       modal.close();

@@ -50,8 +50,6 @@ export default function SubtitlesBox({ fileType }) {
   const handleConfirmDeleteSubtitles = () => {
     clearSessionStorageItem(fileType);
     setSubtitlesData(null);
-    
-    // player.removeRemoteTextTrack(subtitlesData?.url);
   };
 
   return (

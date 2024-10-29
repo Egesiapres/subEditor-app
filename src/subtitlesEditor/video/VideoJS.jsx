@@ -34,14 +34,12 @@ export default function VideoJS({ options, onReady }) {
       player.autoplay(options.autoplay);
       player.src(options.sources);
 
-      if (options.tracks) {
-        player.addRemoteTextTrack(options.tracks[0]);
-      }
+      options.tracks && player.addRemoteTextTrack(options.tracks[0]);
 
       const remoteTextTracks = player.remoteTextTracks();
       console.log("remoteTextTracks", remoteTextTracks);
 
-      player.currentTime(msToSeconds(clickedTime));
+      clickedTime && player.currentTime(msToSeconds(clickedTime));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

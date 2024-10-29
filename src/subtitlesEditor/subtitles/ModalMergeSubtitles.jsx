@@ -30,8 +30,6 @@ import SubtitleTableRow from "./SubtitleTableRow";
 
 export default function ModalMergeSubtitles({ modal, fileType, status }) {
   const {
-    // subtitles,
-    // setSubtitles,
     subtitlesData,
     setSubtitlesData,
     selectedRows,
@@ -57,17 +55,23 @@ export default function ModalMergeSubtitles({ modal, fileType, status }) {
     status.setLoading();
 
     try {
-      let _subtitles = [...subtitles];
-      _subtitles.splice(_subtitles.indexOf(firstRow), 2, mergedRow);
+      subtitles.splice(subtitles.indexOf(firstRow), 2, mergedRow);
 
-      // eslint-disable-next-line no-unused-vars
-      _subtitles = _subtitles.map(({ id: noSyncedId, ...rest }, index) => ({
-        id: index + 1,
-        ...rest,
+      const _subtitles = subtitles.map(
+        // eslint-disable-next-line no-unused-vars
+        ({ id: noSyncedId, ...rest }, index) => ({
+          id: index + 1,
+          ...rest,
+        })
+      );
+
+      const formattedSubtitles = _subtitles.map(({ start, end, text }) => ({
+        data: { start, end, text },
+        type: "cue",
       }));
 
       // Get Vtt object using crateUrlObject (as for the video file)
-      const vttContent = stringifySync(_subtitles, {
+      const vttContent = stringifySync(formattedSubtitles, {
         format: "WebVTT",
       });
       const vttBlob = new Blob([vttContent]);
@@ -83,7 +87,6 @@ export default function ModalMergeSubtitles({ modal, fileType, status }) {
       clearSessionStorageItem(fileType);
       setSubtitlesData(null);
 
-      // TODO: BUG: player subtitles do not update
       const remoteTextTracks = player.remoteTextTracks();
       player.removeRemoteTextTrack(remoteTextTracks[0]);
 
@@ -91,19 +94,7 @@ export default function ModalMergeSubtitles({ modal, fileType, status }) {
       setSubtitlesData(_subtitlesData);
       setSelectedRows([]);
 
-      player.addRemoteTextTrack({
-        kind: "subtitles",
-        src: _subtitlesData.url,
-        srcLang: "en",
-        label: "English",
-        default: true,
-      });
-
-      player.load();
-      player.currentTime(0);
-
-      status.setSuccess();
-      modal.close();
+      // player.currentTime(mergedRow.start);
 
       status.setSuccess();
       modal.close();
