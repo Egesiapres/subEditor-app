@@ -70,8 +70,7 @@ export default function SubtitlesBox({ fileType }) {
               color="action"
             />
           }
-          isUpload={!subtitlesData}
-          isDisabled={!videoData}
+          isUpload={!subtitlesData}          
           secondButton={
             <Button
               variant="contained"
@@ -96,10 +95,8 @@ export default function SubtitlesBox({ fileType }) {
             fileType={fileType}
             selectedRows={selectedRows}
           />
-        ) : videoData ? (
-          <Info text="No Subtitles file detected. To see Subtitles details, please upload a .srt file." />
         ) : (
-          <Info text="No Video file detected. To see Subtitles details, please upload Video file first." />
+          <Info text="No Video file detected. To see Subtitles details, please upload a .srt file." />
         )}
 
         {subtitlesData && !videoData && (
