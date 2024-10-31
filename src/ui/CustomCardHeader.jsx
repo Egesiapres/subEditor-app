@@ -16,8 +16,8 @@ export default function CustomCardHeader({
 }) {
   const player = videojs.players?.video_js;
 
-  const onClick = () => {
-    player && player.pause();
+  const handleClick = () => {
+    player?.pause();
     modal.open();
   };
 
@@ -56,7 +56,7 @@ export default function CustomCardHeader({
             <Button
               disabled={isUpload && isDisabled}
               startIcon={isUpload ? <UploadIcon /> : <DeleteIcon />}
-              onClick={onClick}
+              onClick={handleClick}
             >
               {isUpload ? "Upload" : "Delete"}
             </Button>

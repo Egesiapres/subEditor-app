@@ -103,7 +103,7 @@ export default function AudioWave({ audioData }) {
     const wsCurrentTime = wavesurfer.getCurrentTime();
 
     player.currentTime(wsCurrentTime);
-    player.play();
+    player.pause();
   };
 
   // const onPlayPause = () => {

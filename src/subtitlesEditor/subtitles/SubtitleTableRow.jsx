@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import { useContext } from "react";
 import { formatTimestamp } from "subtitle";
+import videojs from "video.js";
 import { SubtitleEditorContext } from "../../context/SubtitleEditorContext";
 
 export default function SubtitleTableRow({
@@ -20,9 +21,18 @@ export default function SubtitleTableRow({
     SubtitleEditorContext
   );
 
+  const player = videojs.players?.video_js;
+
   const [firstRow] = selectedRows;
 
+  const handleClick = () => {
+    player?.pause();
+    modalSubtitle.open();
+  };
+
   const handleChange = e => {
+    player?.pause();
+
     const isChecked = e.target.checked;
 
     if (isChecked) {
@@ -93,7 +103,7 @@ export default function SubtitleTableRow({
       {!isReadOnly && (
         <TableCell key={row.id}>
           <IconButton
-            onClick={modalSubtitle.open}
+            onClick={handleClick}
             disabled={selectedRows.length > 0}
           >
             <EditIcon fontSize="small" />

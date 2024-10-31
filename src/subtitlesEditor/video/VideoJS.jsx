@@ -9,7 +9,7 @@ export default function VideoJS({ options, onReady }) {
 
   const playerRef = useRef(null);
 
-  const { clickedTime } = useContext(SubtitleEditorContext);
+  const { clickedTime, setClickedTime } = useContext(SubtitleEditorContext);
 
   useEffect(() => {
     // Make sure Video.js player is only initialized once
@@ -43,7 +43,11 @@ export default function VideoJS({ options, onReady }) {
       // debug
       // console.log("remoteTextTracks", remoteTextTracks);
 
-      clickedTime && player.currentTime(msToSeconds(clickedTime, true));
+      // 0 has not to be considered a Falsy value
+      if (typeof clickedTime === "number") {
+        player.currentTime(msToSeconds(clickedTime, true));
+        setClickedTime(null);
+      }
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

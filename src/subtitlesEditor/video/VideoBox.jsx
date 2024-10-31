@@ -105,16 +105,16 @@ export default function VideoBox({ fileType, videoStatus }) {
           <Loading />
         ) : videoStatus.error ? (
           <Error error={videoStatus.error} />
-        ) : videoData ? (
-          <VideoJS
-            options={videoJsOptions}
-            onReady={handlePlayerReady}
-          />
         ) : (
           <>
-            <VideoJS options={videoJsOptions} />
+            <VideoJS
+              options={videoJsOptions}
+              onReady={handlePlayerReady}
+            />
 
-            <Info text="No Video file detected. To play a Video, please upload a .mp4 file." />
+            {!videoData && (
+              <Info text="No Video file detected. To play a Video, please upload a .mp4 file." />
+            )}
           </>
         )}
 
