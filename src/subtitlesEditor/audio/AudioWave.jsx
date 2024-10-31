@@ -11,7 +11,7 @@ import theme from "../../theme/theme";
 import { msToSeconds } from "../../utils/time";
 
 export default function AudioWave({ audioData }) {
-  const { subtitlesData } = useContext(SubtitleEditorContext);
+  const { subtitlesData, clickedTime } = useContext(SubtitleEditorContext);
 
   const player = videojs.players?.video_js;
 

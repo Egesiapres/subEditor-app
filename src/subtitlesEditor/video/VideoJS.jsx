@@ -45,8 +45,9 @@ export default function VideoJS({ options, onReady }) {
 
       // 0 has not to be considered a Falsy value
       if (typeof clickedTime === "number") {
-        player.currentTime(msToSeconds(clickedTime, true));
+        player.currentTime(msToSeconds(clickedTime, true));        
         setClickedTime(null);
+        player.pause();
       }
     }
 
