@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@mui/material";
+import videojs from "video.js";
 import { fakeRequest } from "../api/api";
 import ModalCloseButton from "../ui/ModalCloseButton";
 
@@ -16,6 +17,8 @@ export default function ModalConfirm({
   handleConfirm,
   status,
 }) {
+  const player = videojs.players?.video_js;
+  
   const handleClick = async () => {
     status.setLoading();
 
@@ -23,6 +26,8 @@ export default function ModalConfirm({
       handleConfirm();
       
       await fakeRequest();
+
+      player.currentTime(0);
 
       status.setSuccess();
       modal.close();

@@ -19,6 +19,7 @@
     "@mui/icons-material": "^6.1.4",
     "@mui/lab": "^6.0.0-beta.12",
     "@mui/material": "^6.1.4",
+    "@wavesurfer/react": "^1.0.7",
     "axios": "^1.7.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

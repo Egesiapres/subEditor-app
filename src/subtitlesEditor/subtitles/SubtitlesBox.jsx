@@ -12,6 +12,7 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import { useContext, useEffect, useState } from "react";
+import videojs from "video.js";
 import { SubtitleEditorContext } from "../../context/SubtitleEditorContext";
 import useModal from "../../hooks/useModal";
 import { useStatus } from "../../hooks/useStatus";
@@ -31,13 +32,8 @@ import ModalSubtitle from "./ModalSubtitle";
 import SubtitleTableRow from "./SubtitleTableRow";
 
 export default function SubtitlesBox({ fileType }) {
-  const {
-    subtitlesData,
-    setSubtitlesData,
-    videoData,
-    selectedRows,
-    // player,
-  } = useContext(SubtitleEditorContext);
+  const { subtitlesData, setSubtitlesData, videoData, selectedRows } =
+    useContext(SubtitleEditorContext);
 
   const subtitleStatus = useStatus();
 
@@ -70,7 +66,8 @@ export default function SubtitlesBox({ fileType }) {
               color="action"
             />
           }
-          isUpload={!subtitlesData}          
+          isUpload={!subtitlesData}
+          isDisabled={!videoData}
           secondButton={
             <Button
               variant="contained"
@@ -95,9 +92,15 @@ export default function SubtitlesBox({ fileType }) {
             fileType={fileType}
             selectedRows={selectedRows}
           />
+        ) : videoData ? (
+          <Info text="No Subtitles file detected. To see Subtitles details, please upload a .srt file." />
         ) : (
-          <Info text="No Video file detected. To see Subtitles details, please upload a .srt file." />
+          <Info text="No Video file detected. To see Subtitles details, please upload Video file first." />
         )}
+
+        {/* ) : (
+          <Info text="No Video file detected. To see Subtitles details, please upload a .srt file." />
+        )} */}
 
         {subtitlesData && !videoData && (
           <Warning text="No Video file detected. To display the Subtitles, please upload a .mp4 file." />
@@ -134,14 +137,17 @@ export default function SubtitlesBox({ fileType }) {
 }
 
 const SubtitleTable = ({ subtitles, fileType, selectedRows }) => {
-  const { player } = useContext(SubtitleEditorContext);
+  const player = videojs.players?.video_js;
+  // console.log("player", player);
 
   const [currentSubtitleIndex, setCurrentSubtitleIndex] = useState(-1);
 
   useEffect(() => {
     if (player) {
       const updateCurrentSubtitle = () => {
-        const currentTime = secondsToMs(player?.currentTime());
+        const currentTime = secondsToMs(player.currentTime());
+        // debug
+        // console.log("currentTime", currentTime);
 
         // Find the current Subtitle Row Index
         const index = subtitles.findIndex(
@@ -154,8 +160,7 @@ const SubtitleTable = ({ subtitles, fileType, selectedRows }) => {
 
       // Update the Index every time the time changes
       player.on("timeupdate", updateCurrentSubtitle);
-
-      // Cleanup event listeners
+      
       return () => {
         player.off("timeupdate", updateCurrentSubtitle);
       };

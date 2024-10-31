@@ -1,5 +1,4 @@
 import { createContext, useState } from "react";
-import videojs from "video.js";
 import {
   // eslint-disable-next-line no-unused-vars
   clearSessionStorageItems,
@@ -23,9 +22,6 @@ export const SubtitleEditorContextProvider = ({ children }) => {
 
   const [selectedRows, setSelectedRows] = useState([]);
 
-  const player = videojs?.players?.video_js;
-  // console.log("player", player);
-
   const [clickedTime, setClickedTime] = useState(null);
 
   const value = {
@@ -40,8 +36,6 @@ export const SubtitleEditorContextProvider = ({ children }) => {
     setAudioData,
     setSelectedRows,
     setClickedTime,
-
-    player,
   };
 
   return (

@@ -1,7 +1,8 @@
-import FilePresentRoundedIcon from "@mui/icons-material/FilePresentRounded";
 import DeleteIcon from "@mui/icons-material/Delete";
+import FilePresentRoundedIcon from "@mui/icons-material/FilePresentRounded";
 import UploadIcon from "@mui/icons-material/Upload";
 import { Button, CardHeader, Chip, Grid2 } from "@mui/material";
+import videojs from "video.js";
 
 export default function CustomCardHeader({
   modal,
@@ -13,6 +14,13 @@ export default function CustomCardHeader({
   isDisabled = false,
   secondButton,
 }) {
+  const player = videojs.players?.video_js;
+
+  const onClick = () => {
+    player && player.pause();
+    modal.open();
+  };
+
   return (
     <CardHeader
       subheader={
@@ -48,7 +56,7 @@ export default function CustomCardHeader({
             <Button
               disabled={isUpload && isDisabled}
               startIcon={isUpload ? <UploadIcon /> : <DeleteIcon />}
-              onClick={modal.open}
+              onClick={onClick}
             >
               {isUpload ? "Upload" : "Delete"}
             </Button>

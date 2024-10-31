@@ -40,9 +40,10 @@ export default function VideoJS({ options, onReady }) {
         ? player.addRemoteTextTrack(options.tracks[0])
         : player.removeRemoteTextTrack(remoteTextTracks[0]);
 
-      console.log("remoteTextTracks", remoteTextTracks);
+      // debug
+      // console.log("remoteTextTracks", remoteTextTracks);
 
-      clickedTime && player.currentTime(msToSeconds(clickedTime));
+      clickedTime && player.currentTime(msToSeconds(clickedTime, true));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

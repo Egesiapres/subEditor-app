@@ -16,7 +16,7 @@ import ModalUpload from "../ModalUpload";
 import VideoJS from "./VideoJS";
 
 export default function VideoBox({ fileType, videoStatus }) {
-  const { videoData, setVideoData, subtitlesData } = useContext(
+  const { videoData, setVideoData, subtitlesData, setAudioData } = useContext(
     SubtitleEditorContext
   );
 
@@ -78,6 +78,9 @@ export default function VideoBox({ fileType, videoStatus }) {
   const handleConfirmDeleteVideo = () => {
     clearSessionStorageItem(fileType);
     setVideoData(null);
+
+    clearSessionStorageItem("audio");
+    setAudioData(null);
   };
 
   return (

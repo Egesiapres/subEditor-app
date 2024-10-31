@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import { useContext } from "react";
 import { stringifySync } from "subtitle";
+import videojs from "video.js";
 import { fakeRequest } from "../../api/api";
 import { SubtitleEditorContext } from "../../context/SubtitleEditorContext";
 import CustomTypography from "../../ui/CustomTypography";
@@ -29,13 +30,10 @@ import { capitalizeFirstChar } from "../../utils/text";
 import SubtitleTableRow from "./SubtitleTableRow";
 
 export default function ModalMergeSubtitles({ modal, fileType, status }) {
-  const {
-    subtitlesData,
-    setSubtitlesData,
-    selectedRows,
-    setSelectedRows,
-    player,
-  } = useContext(SubtitleEditorContext);
+  const { subtitlesData, setSubtitlesData, selectedRows, setSelectedRows } =
+    useContext(SubtitleEditorContext);
+
+  const player = videojs.players?.video_js;
 
   const { name, subtitles } = subtitlesData;
 
@@ -88,13 +86,15 @@ export default function ModalMergeSubtitles({ modal, fileType, status }) {
       setSubtitlesData(null);
 
       const remoteTextTracks = player.remoteTextTracks();
+
       player.removeRemoteTextTrack(remoteTextTracks[0]);
 
       setSessionStorageItem(fileType, _subtitlesData);
       setSubtitlesData(_subtitlesData);
       setSelectedRows([]);
 
-      // player.currentTime(mergedRow.start);
+      player.currentTime(0);
+      // player.currentTime(msToSeconds(mergedRow.start, true));
 
       status.setSuccess();
       modal.close();

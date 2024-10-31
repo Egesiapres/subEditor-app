@@ -1,5 +1,3 @@
-// import { FFmpeg } from "@ffmpeg/ffmpeg";
-// import { fetchFile } from "@ffmpeg/util";
 import { LoadingButton } from "@mui/lab";
 import {
   Button,
@@ -10,23 +8,26 @@ import {
 } from "@mui/material";
 import { useContext, useState } from "react";
 import { parseSync, stringifySync } from "subtitle";
+import videojs from "video.js";
 import { fakeRequest } from "../api/api";
 import { SubtitleEditorContext } from "../context/SubtitleEditorContext";
+import useFFmpeg from "../hooks/useFFmpeg";
 import ModalCloseButton from "../ui/ModalCloseButton";
 import Upload from "../ui/Upload";
 import { setSessionStorageItem } from "../utils/sessionStorage";
 import { capitalizeFirstChar } from "../utils/text";
 
-// const ffmpeg = new FFmpeg({ log: true });
-
+// TODO: improve status management & error handling
 export default function ModalUpload({ modal, fileType, status }) {
-  const {
-    setSubtitlesData,
-    setVideoData,
-    // setAudioData
-  } = useContext(SubtitleEditorContext);
+  const { setSubtitlesData, setVideoData, setAudioData } = useContext(
+    SubtitleEditorContext
+  );
+
+  const player = videojs.players?.video_js;
 
   const [selectedFile, setSelectedFile] = useState(null);
+
+  const { ffmpegLoad, ffmpegTranscode } = useFFmpeg();
 
   const isSubtitles = fileType === "subtitles";
 
@@ -77,6 +78,8 @@ export default function ModalUpload({ modal, fileType, status }) {
         setSessionStorageItem(fileType, _subtitlesData);
         setSubtitlesData(_subtitlesData);
 
+        player.currentTime(0);
+
         status.setSuccess();
         modal.close();
       };
@@ -96,49 +99,31 @@ export default function ModalUpload({ modal, fileType, status }) {
     status.setLoading();
 
     try {
-      // const videoBlob = new Blob([selectedFile]);
-
       const _videoData = {
         name: selectedFile.name,
-        // url: URL.createObjectURL(videoBlob),
         url: URL.createObjectURL(selectedFile),
       };
 
-      await fakeRequest(2000);
+      await fakeRequest(1000);
 
       // Upload the Video
       setSessionStorageItem(fileType, _videoData);
       setVideoData(_videoData);
 
       // ! Transform the .mp4 file & Upload Audio
-      // await ffmpeg.load();
+      await ffmpegLoad();
 
-      // // Upload the Video file
-      // await ffmpeg.writeFile("input.mp4", await fetchFile(_videoData.url));
+      const audioContent = await ffmpegTranscode(_videoData.url);
 
-      // // Execute the cmd to extract the audio in .mp3 format
-      // await ffmpeg.run(
-      //   "-i",
-      //   _videoData.url,
-      //   "-q:a",
-      //   "0",
-      //   "-map",
-      //   "a",
-      //   "audio.mp3"
-      // );
+      const audioBlob = new Blob([audioContent.buffer], { type: "audio/mp3" });
 
-      // // GEt the extracted Audio
-      // const _audio = await ffmpeg.readFile("audio.mp3");
+      const _audioData = {
+        name: "extracted_audio.mp3",
+        url: URL.createObjectURL(audioBlob),
+      };
 
-      // const audioBlob = new Blob([_audio.buffer], { type: "audio/mp3" });
-
-      // const _audioData = {
-      //   name: _audio.name,
-      //   url: URL.createObjectURL(audioBlob),
-      // };
-
-      // setSessionStorageItem("audio", _audioData);
-      // setAudio(_audioData);
+      setSessionStorageItem("audio", _audioData);
+      setAudioData(_audioData);
 
       status.setSuccess();
       modal.close();

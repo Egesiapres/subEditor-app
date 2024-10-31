@@ -32,7 +32,7 @@ export default function AudioBox({ videoStatus }) {
       ) : videoStatus.error ? (
         <Error error={videoStatus.error} />
       ) : videoData ? (
-        <AudioWave videoData={videoData} />
+        <AudioWave audioData={audioData} />
       ) : (
         <Info text="No Video file detected. The WaveForm will appear once the Video has been uploaded." />
       )}

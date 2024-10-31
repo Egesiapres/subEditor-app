@@ -92,7 +92,10 @@ export default function SubtitleTableRow({
 
       {!isReadOnly && (
         <TableCell key={row.id}>
-          <IconButton onClick={modalSubtitle.open}>
+          <IconButton
+            onClick={modalSubtitle.open}
+            disabled={selectedRows.length > 0}
+          >
             <EditIcon fontSize="small" />
           </IconButton>
         </TableCell>

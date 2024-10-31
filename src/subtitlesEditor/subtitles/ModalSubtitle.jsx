@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { useContext, useState } from "react";
 import { stringifySync } from "subtitle";
+import videojs from "video.js";
 import { fakeRequest } from "../../api/api";
 import { SubtitleEditorContext } from "../../context/SubtitleEditorContext";
 import ModalCloseButton from "../../ui/ModalCloseButton";
@@ -24,13 +25,9 @@ import { capitalizeFirstChar } from "../../utils/text";
 import { msToSeconds } from "../../utils/time";
 
 export default function ModalSubtitle({ modal, fileType, row, status }) {
-  const {
-    // subtitles,
-    // setSubtitles,
-    subtitlesData,
-    setSubtitlesData,
-    player,
-  } = useContext(SubtitleEditorContext);
+  const { subtitlesData, setSubtitlesData } = useContext(SubtitleEditorContext);
+
+  const player = videojs.players?.video_js;
 
   const { subtitles } = subtitlesData;
 
@@ -102,7 +99,8 @@ export default function ModalSubtitle({ modal, fileType, row, status }) {
       setSessionStorageItem(fileType, _subtitlesData);
       setSubtitlesData(_subtitlesData);
 
-      // player.currentTime(startTimeSlider);
+      player.currentTime(0);
+      // player.currentTime(msToSeconds(startTimeSlider, true));
 
       status.setSuccess();
       modal.close();
