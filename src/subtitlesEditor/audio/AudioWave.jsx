@@ -127,7 +127,7 @@ export default function AudioWave({ audioData }) {
           <TableCell sx={{ p: 0 }}>
             <WavesurferPlayer
               height={200}
-              barHeight={2.5}
+              barHeight={1.5}
               barWidth={1.5}
               barRadius={2}
               barGap={1}
