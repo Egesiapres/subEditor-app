@@ -22,7 +22,7 @@ import {
   setSessionStorageItem,
 } from "../../utils/sessionStorage";
 import { capitalizeFirstChar } from "../../utils/text";
-import { msToSeconds } from "../../utils/time";
+import { msToSeconds, secondsToMs } from "../../utils/time";
 
 export default function ModalSubtitle({ modal, fileType, row, status }) {
   const { subtitlesData, setSubtitlesData } = useContext(SubtitleEditorContext);
@@ -47,9 +47,9 @@ export default function ModalSubtitle({ modal, fileType, row, status }) {
 
   const isLastEndTime = row?.id === subtitles.length;
 
-  const minStartTime = isFirstStartTime ? pastEndTime : pastEndTime + 1;
+  const minStartTime = isFirstStartTime ? 0 : pastEndTime + 1;
 
-  const maxEndTime = isLastEndTime ? nextStartTime : nextStartTime - 1;
+  const maxEndTime = isLastEndTime ? secondsToMs(player.duration()) : nextStartTime - 1;
 
   const [durationSlider, setDurationSlider] = useState([startTime, endTime]);
 

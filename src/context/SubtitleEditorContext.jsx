@@ -13,8 +13,6 @@ export const SubtitleEditorContextProvider = ({ children }) => {
   const _subtitlesData = getSessionStorageItem("subtitles");
   const _videoData = getSessionStorageItem("video");
   const _audioData = getSessionStorageItem("audio");
-  console.log("_videoData", _videoData);
-  console.log("_audioData", _audioData);
 
   // console.log(sessionStorage);
 

@@ -37,9 +37,9 @@ export default function AudioWave({ audioData }) {
   }, []);
 
   // Regions random colors
-  const random = (min, max) => Math.random() * (max - min) + min;
-  const randomColor = () =>
-    `rgba(${random(0, 255)}, ${random(0, 255)}, ${random(0, 255)}, 0.5)`;
+  // const random = (min, max) => Math.random() * (max - min) + min;
+  // const randomColor = () =>
+  //   `rgba(${random(0, 255)}, ${random(0, 255)}, ${random(0, 255)}, 0.5)`;
 
   useEffect(() => {
     plugins[0].clearRegions();
@@ -50,7 +50,8 @@ export default function AudioWave({ audioData }) {
           start: msToSeconds(subtitle.start, true),
           end: msToSeconds(subtitle.end, true),
           content: subtitle.text,
-          color: randomColor(),
+          // color: randomColor(),
+          color: "rgba(222, 216, 243, 0.5)",          
           drag: false,
           resize: false,
         });
