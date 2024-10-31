@@ -1,0 +1,6 @@
+[[headers]]
+for = "/*"
+[headers.values]
+access-control-allow-origin = "https://subeditor.netlify.app"
+Cross-Origin-Embedder-Policy = "require-corp"
+Cross-Origin-Opener-Policy = "same-origin"
