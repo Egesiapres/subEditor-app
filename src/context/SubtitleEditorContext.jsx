@@ -14,7 +14,7 @@ export const SubtitleEditorContextProvider = ({ children }) => {
   const _videoData = getSessionStorageItem("Video");
   const _audioData = getSessionStorageItem("audio");
 
-  console.log(sessionStorage);
+  // console.log(sessionStorage);
 
   const [subtitlesData, setSubtitlesData] = useState(_subtitlesData || null);
   const [videoData, setVideoData] = useState(_videoData || "");

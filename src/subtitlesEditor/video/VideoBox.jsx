@@ -1,6 +1,6 @@
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import { Card, Divider } from "@mui/material";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useRef } from "react";
 import videojs from "video.js";
 import { SubtitleEditorContext } from "../../context/SubtitleEditorContext";
 import useModal from "../../hooks/useModal";
@@ -53,10 +53,10 @@ export default function VideoBox({ fileType, videoStatus }) {
     }),
   };
 
-  useEffect(() => {
-    console.log("videoJsOptions", videoJsOptions);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subtitlesData, videoData]);
+  // useEffect(() => {
+  //   console.log("videoJsOptions", videoJsOptions);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [subtitlesData, videoData]);
 
   const handlePlayerReady = player => {
     playerRef.current = player;
@@ -71,7 +71,7 @@ export default function VideoBox({ fileType, videoStatus }) {
     });
 
     player.on("seeked", () => {
-      videojs.log("Player has jumped to time: ", player.currentTime());
+      videojs.log("player has jumped to time: ", player.currentTime());
     });
   };
 

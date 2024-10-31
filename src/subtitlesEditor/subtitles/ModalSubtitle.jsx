@@ -86,7 +86,7 @@ export default function ModalSubtitle({ modal, fileType, row, status }) {
         subtitles,
       };
 
-      console.log("_subtitlesData", _subtitlesData, "subtitles", subtitles);
+      // console.log("_subtitlesData", _subtitlesData, "subtitles", subtitles);
 
       await fakeRequest();
 
