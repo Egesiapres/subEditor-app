@@ -1,5 +1,7 @@
 import DashboardLayout from "./DashboardLayout";
 
-export default function DashboardUser({ children }) {
-  return <DashboardLayout>{children}</DashboardLayout>;
-}
+const DashboardUser: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => <DashboardLayout>{children}</DashboardLayout>;
+
+export default DashboardUser;

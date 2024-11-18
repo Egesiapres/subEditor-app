@@ -1,4 +1,5 @@
-export const formatFromPath = path => path.split("/").join(" ");
+export const formatFromPath = (path: string): string =>
+  path.split("/").join(" ");
 
-export const capitalizeFirstChar = string =>
-  `${string[0].toUpperCase()}${string.slice(1)}`;
+export const capitalizeFirstChar = (text: string): string =>
+  `${text[0].toUpperCase()}${text.slice(1)}`;

@@ -3,16 +3,23 @@ import UploadFileRoundedIcon from "@mui/icons-material/UploadFileRounded";
 import VideoFileIcon from "@mui/icons-material/VideoFile";
 import { Button, Chip, Grid2, Typography } from "@mui/material";
 import { useRef } from "react";
+import { Item } from "../utils/sessionStorage";
 import { capitalizeFirstChar } from "../utils/text";
 
-export default function FileUpload({
+interface FileUpload {
+  selectedFile: Item;
+  setSelectedFile: (file: Item | null) => void;
+  fileType: string;
+}
+
+const FileUpload = ({
   selectedFile,
   setSelectedFile,
   fileType,
-}) {
-  const inputRef = useRef(null);
+}: FileUpload) => {
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = e => {
+  const handleFileChange = (e: any): void => {
     const file = e.target.files[0];
     if (file) {
       setSelectedFile(file);
@@ -94,4 +101,6 @@ export default function FileUpload({
       )}
     </>
   );
-}
+};
+
+export default FileUpload;

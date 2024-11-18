@@ -1,5 +1,11 @@
-import { Alert } from "@mui/material";
+import { Alert, AlertProps } from "@mui/material";
 
-export default function Error({ success }) {
-  return <Alert severity="success">{success.message}</Alert>;
+interface SuccessProps extends AlertProps {
+  success: { message: string };
 }
+
+const Success = ({ success: { message } }: SuccessProps) => (
+  <Alert severity="success">{message}</Alert>
+);
+
+export default Success;

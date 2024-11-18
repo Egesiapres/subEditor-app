@@ -2,7 +2,7 @@ import { Button, Grid2, Typography } from "@mui/material";
 import { useNavigate } from "react-router";
 import { formatFromPath } from "../utils/text";
 
-export default function PageError({ targetPage }) {
+export default function PageError({ targetPage = "" }) {
   const navigate = useNavigate();
 
   const handleClick = () => {

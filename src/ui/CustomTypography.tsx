@@ -1,20 +1,20 @@
-import Typography from "@mui/material/Typography";
+import Typography, { TypographyProps } from "@mui/material/Typography";
 
-export default function CustomTypography({
+const CustomTypography: React.FC<TypographyProps> = ({
   children,
   variant = "h6",
   align = "center",
   ...props
-}) {
-  return (
-    <Typography
-      variant={variant}
-      color="secondary"
-      align={align}
-      m={0}
-      {...props}
-    >
-      {children}
-    </Typography>
-  );
-}
+}) => (
+  <Typography
+    variant={variant}
+    color="secondary"
+    align={align}
+    m={0}
+    {...props}
+  >
+    {children}
+  </Typography>
+);
+
+export default CustomTypography;

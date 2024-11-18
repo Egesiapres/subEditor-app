@@ -8,7 +8,17 @@ import {
 } from "@mui/material";
 import videojs from "video.js";
 import { fakeRequest } from "../api/api";
+import { ModalType } from "../hooks/useModal";
+import { StatusType } from "../hooks/useStatus";
 import ModalCloseButton from "./ModalCloseButton";
+
+interface ModalConfirmProps {
+  modal: ModalType;
+  title?: string;
+  text?: string;
+  handleConfirm: () => {};
+  status: StatusType;
+}
 
 export default function ModalConfirm({
   modal,
@@ -16,15 +26,15 @@ export default function ModalConfirm({
   text = "Do you really want to proceed?",
   handleConfirm,
   status,
-}) {
+}: ModalConfirmProps) {
   const player = videojs.players?.video_js;
-  
+
   const handleClick = async () => {
     status.setLoading();
 
     try {
       handleConfirm();
-      
+
       await fakeRequest();
 
       player.currentTime(0);

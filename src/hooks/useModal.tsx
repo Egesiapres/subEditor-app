@@ -1,5 +1,13 @@
 import { useState } from "react";
 
+export type ModalType = {
+  isOpen: boolean;
+  open: () => void;
+  close: () => void;
+  data: object;
+  setData: () => void;
+};
+
 export default function useModal() {
   const [isOpen, setOpen] = useState(false);
 
@@ -9,7 +17,7 @@ export default function useModal() {
     setOpen(true);
   };
 
-  const close = (e, reason) => {
+  const close = (_e: object, reason: string) => {
     if (!reason || reason === "escapeKeyDown") {
       setOpen(false);
     }

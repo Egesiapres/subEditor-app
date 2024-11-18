@@ -3,14 +3,12 @@ import { CssBaseline } from "@mui/material";
 import UnauthenticatedRoutes from "../routes/UnauthenticatedRoutes";
 import theme from "../theme/theme";
 
-const App = () => {
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+const App = () => (
+  <ThemeProvider theme={theme}>
+    <CssBaseline />
 
-      <UnauthenticatedRoutes />
-    </ThemeProvider>
-  );
-};
+    <UnauthenticatedRoutes />
+  </ThemeProvider>
+);
 
 export default App;

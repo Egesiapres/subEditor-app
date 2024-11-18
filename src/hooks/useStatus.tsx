@@ -1,12 +1,30 @@
 import { useReducer } from "react";
+interface State {
+  isLoading: boolean;
+  success: boolean;
+  error: boolean;
+}
 
-const initialState = {
+interface Action {
+  type: string;
+  payload?: any;
+}
+
+export interface StatusType extends State {
+  reset: () => void;
+  setLoading: () => void;
+  setSuccess: () => void;
+  // ?
+  setError: (err: any) => void;
+}
+
+const initialState: State = {
   isLoading: false,
   success: false,
   error: false,
 };
 
-const reducer = (state, action) => {
+const reducer = (state: State, action: Action) => {
   switch (action.type) {
     case "STATUS_RESET":
       return {
@@ -48,12 +66,12 @@ export const useStatus = () => {
 
   const setLoading = () => dispatch({ type: "STATUS_LOADING" });
 
-  const setSuccess = success =>
+  const setSuccess = (success: any) =>
     dispatch({ type: "STATUS_SUCCESS", payload: success });
 
-  const setError = error => {
+  const setError = (error: any) => {
     dispatch({ type: "STATUS_ERROR", payload: error });
-    
+
     console.error(error);
   };
 

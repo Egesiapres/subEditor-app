@@ -1,6 +1,6 @@
 import MenuIcon from "@mui/icons-material/Menu";
 import { IconButton, Toolbar, Typography, styled } from "@mui/material";
-import MuiAppBar from "@mui/material/AppBar";
+import MuiAppBar, { AppBarProps } from "@mui/material/AppBar";
 
 const drawerWidth = 240;
 
@@ -22,40 +22,40 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-export default function DashboardAppBar({ open, toggleDrawer }) {
-  return (
-    <AppBar
-      position="absolute"
-      open={open}
+const DashboardAppBar = ({ open, toggleDrawer }) => (
+  <AppBar
+    position="absolute"
+    open={open}
+  >
+    <Toolbar
+      sx={{
+        pr: "24px", // keep right padding when drawer closed
+      }}
     >
-      <Toolbar
+      <IconButton
+        edge="start"
+        color="inherit"
+        aria-label="open drawer"
+        onClick={toggleDrawer}
         sx={{
-          pr: "24px", // keep right padding when drawer closed
+          marginRight: "36px",
+          ...(open && { display: "none" }),
         }}
       >
-        <IconButton
-          edge="start"
-          color="inherit"
-          aria-label="open drawer"
-          onClick={toggleDrawer}
-          sx={{
-            marginRight: "36px",
-            ...(open && { display: "none" }),
-          }}
-        >
-          <MenuIcon />
-        </IconButton>
+        <MenuIcon />
+      </IconButton>
 
-        <Typography
-          component="h1"
-          variant="h6"
-          color="inherit"
-          noWrap
-          sx={{ flexGrow: 1 }}
-        >
-          Subtitles Editor
-        </Typography>
-      </Toolbar>
-    </AppBar>
-  );
-}
+      <Typography
+        component="h1"
+        variant="h6"
+        color="inherit"
+        noWrap
+        sx={{ flexGrow: 1 }}
+      >
+        Subtitles Editor
+      </Typography>
+    </Toolbar>
+  </AppBar>
+);
+
+export default DashboardAppBar;

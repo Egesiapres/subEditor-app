@@ -1,5 +1,11 @@
-import { Alert } from "@mui/material";
+import { Alert, AlertProps } from "@mui/material";
 
-export default function Error({ error }) {
-  return <Alert severity="error">{error.message}</Alert>;
+interface ErrorProps extends AlertProps {
+  error: { message: string };
 }
+
+const Error = ({ error: { message } }: ErrorProps) => (
+  <Alert severity="error">{message}</Alert>
+);
+
+export default Error;

@@ -17,9 +17,17 @@ import Upload from "../ui/Upload";
 import { setSessionStorageItem } from "../utils/sessionStorage";
 import { capitalizeFirstChar } from "../utils/text";
 
+export interface Subtitle {
+  id: number;
+  start: number;
+  end: number;
+  duration: number;
+  text: string;
+}
+
 // TODO: improve status management & error handling
 export default function ModalUpload({ modal, fileType, status }) {
-  const { setSubtitlesData, setVideoData, setAudioData } = useContext(
+  const { setSubtitlesData, setVideoData, setAudioData } = useContext<>(
     SubtitleEditorContext
   );
 

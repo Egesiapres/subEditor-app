@@ -1,12 +1,16 @@
-import { Alert } from "@mui/material";
+import { Alert, AlertProps } from "@mui/material";
 
-export default function Info({ text, sx = { borderRadius: 0 } }) {
-  return (
-    <Alert
-      severity="warning"
-      sx={sx}
-    >
-      {text}
-    </Alert>
-  );
+interface InfoProps extends AlertProps {
+  text: string;
 }
+
+const Info = ({ text, sx = { borderRadius: 0 } }: InfoProps) => (
+  <Alert
+    severity="warning"
+    sx={sx}
+  >
+    {text}
+  </Alert>
+);
+
+export default Info;

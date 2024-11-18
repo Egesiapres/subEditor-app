@@ -5,7 +5,9 @@ import { useState } from "react";
 import DashboardAppBar from "./DashboardAppBar";
 import DashboardDrawer from "./DashboardDrawer";
 
-export default function DashboardLayout({ children }) {
+const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [open, setOpen] = useState(false);
 
   const toggleDrawer = () => {
@@ -43,4 +45,6 @@ export default function DashboardLayout({ children }) {
       </Box>
     </Box>
   );
-}
+};
+
+export default DashboardLayout;

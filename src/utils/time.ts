@@ -1,4 +1,7 @@
-export const msToSeconds = (milliseconds, isDecimals = false) => {
+export const msToSeconds = (
+  milliseconds: number,
+  isDecimals: boolean = false
+): number => {
   let result = milliseconds / 1000;
 
   result = isDecimals ? result : Math.floor(result);
@@ -6,4 +9,5 @@ export const msToSeconds = (milliseconds, isDecimals = false) => {
   return result;
 };
 
-export const secondsToMs = seconds => Math.floor(seconds * 1000);
+export const secondsToMs = (seconds: number): number =>
+  Math.floor(seconds * 1000);

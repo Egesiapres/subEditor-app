@@ -1,6 +1,6 @@
-import { CircularProgress, Grid2 } from "@mui/material";
+import { CircularProgress, CircularProgressProps, Grid2 } from "@mui/material";
 
-export default function Loading({ sx = { my: 2 }, size = 40 }) {
+const Loading = ({ size = 40, sx = { my: 2 } }: CircularProgressProps) => {
   return (
     <Grid2
       container
@@ -12,4 +12,6 @@ export default function Loading({ sx = { my: 2 }, size = 40 }) {
       />
     </Grid2>
   );
-}
+};
+
+export default Loading;

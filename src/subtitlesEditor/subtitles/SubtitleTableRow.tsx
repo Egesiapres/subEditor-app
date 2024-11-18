@@ -10,6 +10,7 @@ import { useContext } from "react";
 import { formatTimestamp } from "subtitle";
 import videojs from "video.js";
 import { SubtitleEditorContext } from "../../context/SubtitleEditorContext";
+import { Subtitle } from "../ModalUpload";
 
 export default function SubtitleTableRow({
   row,
@@ -41,7 +42,9 @@ export default function SubtitleTableRow({
       }
     } else {
       setSelectedRows(
-        selectedRows.filter(selectedRow => selectedRow.id !== row.id)
+        selectedRows.filter(
+          (selectedRow: Subtitle) => selectedRow.id !== row.id
+        )
       );
     }
   };
@@ -49,7 +52,7 @@ export default function SubtitleTableRow({
   const isDisabled = selectedRows?.length >= 1;
 
   const isSelected = selectedRows?.some(
-    selectedRow => selectedRow.id === row.id
+    (selectedRow: Subtitle) => selectedRow.id === row.id
   );
 
   const isNext =
