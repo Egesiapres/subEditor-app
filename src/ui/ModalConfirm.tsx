@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import videojs from "video.js";
 import { fakeRequest } from "../api/api";
-import ModalCloseButton from "../ui/ModalCloseButton";
+import ModalCloseButton from "./ModalCloseButton";
 
 export default function ModalConfirm({
   modal,
